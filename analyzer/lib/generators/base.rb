@@ -62,6 +62,7 @@ module VersatileDiamond
       def specific_surface_specs
         (specific_specs || []).reject(&:gas?)
       end
+
     end
 
   end

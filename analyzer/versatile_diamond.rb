@@ -1,6 +1,7 @@
 require 'pry'
 
 require 'graphviz'
+require 'nokogiri'
 
 require 'forwardable'
 require 'fileutils'

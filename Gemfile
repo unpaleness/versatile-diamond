@@ -5,6 +5,7 @@ group :ruby do
   gem 'docopt'
   gem 'ffi'
   gem 'i18n'
+  gem 'nokogiri'
   gem 'ruby-graphviz'
 end
 
