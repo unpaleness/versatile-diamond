@@ -18,7 +18,7 @@ Options:
   --composition      Generate graph with dependencies between different atom types
   --overview         Show overal table about used surface specs and their atoms
   --code             Generate code for engine
-  --gchem-formula    Generate an XML document containing GChemPaint illustration of
+  --formula          Generate an XML document containing GChemPaint illustration of
                      all reactions
 
   --name=NAME        Set the name of output generation file or another entity
@@ -82,4 +82,4 @@ define_generator['--overview', Gens::Overview]
 define_generator['--composition', Gens::AtomsSpeciesTree, out['composition']]
 define_generator['--total-tree', Gens::SpeciesReactionsTree, out['total-tree']]
 define_generator['--code', Gens::EngineCode, out['generations']]
-define_generator['--gchem-formula', Gens::EngineCode, out['ghcem-formula']]
+define_generator['--formula', Gens::GChemFormula, out['gchem-formula']]
