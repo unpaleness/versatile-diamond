@@ -8,17 +8,21 @@ module VersatileDiamond
       # @override
       def initialize(analysis_result, out_path)
         super(analysis_result)
+        @out_path = out_path
         puts "Class GChemFormula initialized!"
       end
 
       def generate(**params)
-        xml_stream = Nokogiri::XML::Builder.new
         puts "GChemFormula generator now executes!"
         i = 0
         all_specs.each do |dep_spec|
           puts "#{i}"
-          Formula::Specie.new(i.to_s, dep_spec.spec).draw(xml_stream)
+          xml_stream = Nokogiri::XML::Builder.new do |xml|
+            Formula::Specie.new(dep_spec.spec).draw(xml)
+          end
+          File.open("#{@out_path}#{i}.gchempaint", 'w') { |f| f.write(xml_stream.to_xml) }
           i += 1
+          break if i > 0 # GOTO: A VERY SPIKY EXIT!!!
         end
       end
     end

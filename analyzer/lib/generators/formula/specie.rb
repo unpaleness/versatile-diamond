@@ -5,14 +5,17 @@ module VersatileDiamond
       # Created class 'Specie' for formula
       class Specie
 
-        def initialize(filename, spec)
+        def initialize(spec)
           # binding.pry
-          @filename = filename
           @spec = spec
         end
 
-        def draw(xml_stream)
-          puts "#{@spec.to_s}\n"
+        def draw(xml)
+          # puts "#{@spec.to_s}\n"
+          xml['gcp'].chemistry('xmlns:gcp' => 'http://www.nongnu.org/gchempaint') do
+            xml.molecule('id' => '1') do
+            end
+          end
         end
       end
 
