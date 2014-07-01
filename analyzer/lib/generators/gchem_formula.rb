@@ -18,7 +18,7 @@ module VersatileDiamond
       def generate(**params)
         # puts "GChemFormula generator now executes!"
         # initializing indexes of species and atoms
-        specie_index = atom_index = bond_index = 0
+        specie_index = 0
         # creating XML-stream
         xml_stream = Nokogiri::XML::Builder.new do |xml|
           # main tag
@@ -26,13 +26,10 @@ module VersatileDiamond
             # for every specie in our model
             specific_surface_specs.each do |dep_spec|
               # 'if' condition should be removed
-              if specie_index == 6
+              # if specie_index == 7
                 # adding atoms and incrementing global atom and bond indexes
-                indexes = Formula::Specie
-                  .new(dep_spec.spec).draw(xml, specie_index, atom_index, bond_index)
-                atom_index += indexes[0]
-                bond_index += indexes[1]
-              end
+                Formula::Specie.new(dep_spec.spec).draw(xml, specie_index)
+              # end
               # incrementing specie index
               specie_index += 1
             end

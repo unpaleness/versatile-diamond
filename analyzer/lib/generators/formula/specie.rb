@@ -9,49 +9,84 @@ module VersatileDiamond
 
         def initialize(spec)
           @spec = spec
-          collect_all
+          @atoms_amount = collect_atoms
+          @bonds_amount = collect_bonds
+          count_coordinates
           # binding.pry
         end
 
-        # Collects all atoms and bonds to appropriate arrays
-        def collect_all
-          @atoms = []
-          @bonds = []
-          atom_index = bond_index = 0
-          @spec.links.each do |key, link|
-            @atoms[atom_index] = Formula::Atom.new(key)
-            # amount of bonds to current atom
-            bonds_amount_inner = link.count
-            (0...bonds_amount_inner).each do |i|
-              @bonds[bond_index + i] = Formula::Bond.new(link)
-            end
-            bond_index += bonds_amount_inner
+        # Collects all atoms to appropriate hash
+        # @return [Integer] total amount of atoms in current specie
+        def collect_atoms
+          @atoms = {}
+          atom_index = 0
+          # process every record in this hash
+          @spec.links.each do |key, pairs|
+            # id of current atom
+            id_atom = key.object_id
+            # adding an atom to hash with object.id as a key
+            @atoms[id_atom] = Formula::Atom.new(key)
             atom_index += 1
           end
-          @atoms_amount = atom_index
-          @bonds_amount = bond_index / 2
-          # binding.pry
+          atom_index
+        end
+
+        # Collects all bonds to appropriate array
+        # @return [Inreger] total amount of bonds in current specie
+        def collect_bonds
+          @bonds = []
+          bond_index = 0
+          # process every record in this hash
+          @spec.links.each do |key, pairs|
+            id_atom = key.object_id
+            # adding bonds to array of bonds
+            (0...(pairs.count)).each do |i|
+              # firstly candidate bond marked as not created
+              already_created = false
+              # checking for bond to be identical to someone previous
+              # if so add +1 to its order
+              (0...bond_index).each do |j|
+                # checking implements throuth comparision of begin and end atoms of
+                # bonds
+                if @bonds[j].id_atom_begin == id_atom &&
+                  @bonds[j].id_atom_end == pairs[i][0].object_id
+                  @bonds[j].order += 1
+                  # mark candidate bond as created
+                  already_created = true
+                end
+              end
+              # else create a new candidate bond
+              if !already_created
+                @bonds[bond_index] =
+                  Formula::Bond.new(id_atom, pairs[i][0].object_id, pairs[i][1])
+                bond_index += 1
+              end
+            end
+          end
+          bond_index
+        end
+
+        # Counts coordinates of every atom in current specie
+        def count_coordinates
+          
         end
 
         # Procedure of drawing a specie.
         # Must be initialized:
         #  - XML stream
         #  - current index of specie (or 'molecule' in GChemPaint)
-        #  - current index of atom (may unused in future)
-        #  - current index of bond (may unused in future)
-        def draw(xml, specie_index, atom_index, bond_index)
-          # xml.molecule('id' => specie_index) do
-          #   (0...@atoms_amount).each do |i|
-          #     xml.atom('id' => "a#{atom_index + i}", 'element' => 'C') do
-          #       xml.position('x' => 100, 'y' => 100)
-          #     end
-          #   end
-          #   (0...@bonds_amount).each do |i|
-          #     xml.bond('id' => "b#{bond_index + i}", 'order' => bonds[i].order,
-          #       'begin' => bonds[i].id_atom_begin, 'end' => bonds[i].id_atom_end)
-          #   end
-          # end
-          [@atoms_amount, @bonds_amount]
+        def draw(xml, specie_index)
+          xml.molecule('id' => specie_index) do
+            @atoms.each do |id, atom|
+              xml.atom('id' => atom.id, 'element' => atom.name) do
+                xml.position('x' => 100, 'y' => 100)
+              end
+            end
+            (0...@bonds_amount).each do |i|
+              xml.bond('id' => "b#{i}", 'order' => @bonds[i].order,
+                'begin' => @bonds[i].id_atom_begin, 'end' => @bonds[i].id_atom_end)
+            end
+          end
         end
       end
 
