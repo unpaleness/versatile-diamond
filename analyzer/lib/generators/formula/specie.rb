@@ -5,6 +5,8 @@ module VersatileDiamond
       # Creates class 'Specie' for formula
       class Specie
 
+        attr_reader :spec, :atoms_amount, :bonds_amount, :atoms, :bonds
+
         BOND_LENGTH = 140
 
         def initialize(spec)
@@ -55,8 +57,8 @@ module VersatileDiamond
                   already_created = true
                 end
               end
-              # else create a new candidate bond
-              if !already_created
+              # create a new candidate bond if it was not created
+              if !already_created(@bonds, pairs, bond_index, i, id_atom)
                 @bonds[bond_index] =
                   Formula::Bond.new(id_atom, pairs[i][0].object_id, pairs[i][1])
                 bond_index += 1
@@ -64,6 +66,35 @@ module VersatileDiamond
             end
           end
           bond_index
+        end
+
+        # Checks wheather bond was created or not and adds 'order' parameter to bond
+        # in case of duplication
+        # Reverse bonds are going to be removed completely!!!
+        # @return [Logical] true/false value
+        def already_created(bonds, pairs, bond_index, pair_index, id_atom)
+          # firstly candidate bond marked as not created
+          is_created = false
+          # checking for bond to be identical to someone previous
+          # if so add +1 to its order
+          (0...bond_index).each do |j|
+            # checking implements throuth comparision of begin and end atoms of
+            # bonds
+            if @bonds[j].id_atom_begin == id_atom &&
+              @bonds[j].id_atom_end == pairs[pair_index][0].object_id
+              @bonds[j].order += 1
+              # mark candidate bond as created
+              is_created = true
+            end
+            # checking for reverse to some bond; if so just mark bond as already
+            # created without incrementing order
+            if @bonds[j].id_atom_begin == pairs[pair_index][0].object_id &&
+              @bonds[j].id_atom_end == id_atom
+              # mark candidate bond as created
+              is_created = true
+            end
+          end
+          is_created
         end
 
         # Counts coordinates of every atom in current specie
