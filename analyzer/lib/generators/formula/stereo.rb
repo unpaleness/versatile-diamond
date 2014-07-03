@@ -16,7 +16,8 @@ module VersatileDiamond
       # Converts spherical coordinates ro, phi, etha to decart x, y, z respectively
       # @return [Float, Float, Float]
       def sph_to_dec(ro, phi, etha)
-
+        
+        [x, y, z]
       end
 
     end
