@@ -6,7 +6,7 @@ module VersatileDiamond
       class Specie
 
         include Stereo
-        
+
         attr_reader :spec, :atoms_amount, :bonds_amount, :atoms, :bonds
 
         BOND_LENGTH = 140
@@ -101,7 +101,7 @@ module VersatileDiamond
 
         # Counts coordinates of every atom in current specie
         def count_coordinates
-          
+
         end
 
         # Procedure of drawing a specie.
