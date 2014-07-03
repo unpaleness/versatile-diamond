@@ -5,6 +5,8 @@ module VersatileDiamond
       # Creates class 'Specie' for formula
       class Specie
 
+        include Stereo
+        
         attr_reader :spec, :atoms_amount, :bonds_amount, :atoms, :bonds
 
         BOND_LENGTH = 140
