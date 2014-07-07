@@ -103,4 +103,28 @@ describe Diamond do
       end
     end
   end
+
+  describe '#bond_length' do
+    it { expect(subject.bond_length).to eq(1.54e-10) }
+  end
+
+  describe '#extend_front_100' do
+    [-1, 1].each do |x|
+      let(:ml) { VersatileDiamond::Lattice::MatrixLayout.new }
+      let(:counted_node) { ml.nodes[0][0][x] }
+      let(:result_node) { VersatileDiamond::Lattice::Node.new(0.0, 0.0, subject.dx * x, false) }
+      before { subject.extend_front_100(ml) }
+      it { expect(counted_node).to eq(result_node) }
+    end
+  end
+
+  describe '#extend_cross_100' do
+    [-1, 1].each do |y|
+      let(:ml) { VersatileDiamond::Lattice::MatrixLayout.new }
+      let(:counted_node) { ml.nodes[0][y][0] }
+      let(:result_node) { VersatileDiamond::Lattice::Node.new(0.0, subject.dy * y, 0.0, false) }
+      before { subject.extend_cross_100(ml) }
+      it { expect(counted_node).to eq(result_node) }
+    end
+  end
 end

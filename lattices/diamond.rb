@@ -99,4 +99,71 @@ private
       valence: 4
     }
   end
+
+public
+
+  # @return [Float] a length of bond o_O
+  def bond_length
+    1.54e-10
+  end
+
+  # @return [Float] a shift along x-axis
+  def dx
+    bond_length * Math::sqrt(8.0 / 3.0)
+  end
+
+  # @return [Float] a shift along y-axis
+  def dy
+    bond_length * Math::sqrt(8.0 / 3.0)
+  end
+
+  # @return [Float] a shift along z-axis
+  def dz
+    bond_length * Math::sqrt(1.0 / 3.0)
+  end
+
+  # Extend matrix layout by one bond by direction front_100
+  # @param [MatrixLayout] our matrix layout
+  def extend_front_100(ml)
+    ml.bx[0] -= 1
+    ml.bx[1] += 1
+    (ml.bz[0]..ml.bz[1]).each do |z|
+      (ml.by[0]..ml.by[1]).each do |y|
+        ml.nodes[z][y][ml.bx[0]] = VersatileDiamond::Lattice::Node.
+          new(ml.nodes[z][y][ml.bx[0] + 1])
+        ml.nodes[z][y][ml.bx[0]].x -= dx
+        ml.nodes[z][y][ml.bx[1]] = VersatileDiamond::Lattice::Node.
+          new(ml.nodes[z][y][ml.bx[1] - 1])
+        ml.nodes[z][y][ml.bx[1]].x += dx
+      end
+    end
+  end
+
+  # Extend matrix layout by one bond by direction cross_100
+  # @param [MatrixLayout] our matrix layout
+  def extend_cross_100(ml)
+    ml.by[0] -= 1
+    ml.by[1] += 1
+    (ml.bz[0]..ml.bz[1]).each do |z|
+      ml.nodes[z][ml.by[0]] = {}
+      (ml.bx[0]..ml.bx[1]).each do |x|
+        ml.nodes[z][ml.by[0]][x] = VersatileDiamond::Lattice::Node.
+          new(ml.nodes[z][ml.by[0] + 1][x])
+        ml.nodes[z][ml.by[0]][x].y -= dy
+      end
+      ml.nodes[z][ml.by[1]] = {}
+      (ml.bx[0]..ml.bx[1]).each do |x|
+        ml.nodes[z][ml.by[1]][x] = VersatileDiamond::Lattice::Node.
+          new(ml.nodes[z][ml.by[1] - 1][x])
+        ml.nodes[z][ml.by[1]][x].y += dy
+      end
+    end
+  end
+
+  # Extend matrix layout by one bond by direction front_110
+  # @param [MatrixLayout] our matrix layout
+  def extend_front_110(ml)
+    ml.bz[0] += 1
+
+  end
 end

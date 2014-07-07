@@ -15,7 +15,7 @@ module VersatileDiamond
           @spec = spec
           @atoms_amount = collect_atoms
           @bonds_amount = collect_bonds
-          count_coordinates
+          bind_bonds_and_atoms
           # binding.pry
         end
 
@@ -70,6 +70,20 @@ module VersatileDiamond
           bond_index
         end
 
+        # Adds references to bonds to every atom
+        def bind_bonds_and_atoms
+          @atoms.each do |id, atom|
+            @bonds.each do |bond|
+              if id == bond.id_atom_begin then
+                atom.bonds[bond.id_atom_end] = bond
+              end
+              if id == bond.id_atom_end then
+                atom.bonds[bond.id_atom_begin] = bond
+              end
+            end
+          end
+        end
+
         # Checks wheather bond was created or not and adds 'order' parameter to bond
         # in case of duplication
         # Reverse bonds are going to be removed completely!!!
@@ -99,13 +113,20 @@ module VersatileDiamond
           is_created
         end
 
-        # Counts coordinates of every atom in current specie
-        def count_coordinates
-
+        # Translates info about spec into string
+        def to_s
+          result = "#{@spec.name}\n"
+          @atoms.each do |id_atom, atom|
+            result << " #{id_atom}\n"
+            atom.bonds.each do |id_atom_dest, bond|
+              result << "  #{id_atom_dest}: #{bond.description}\n"
+            end
+          end
+          result
         end
 
-        # Procedure of drawing a specie.
-        # Must be initialized:
+        # Draws a specie.
+        # Input:
         #  - XML stream
         #  - current index of specie (or 'molecule' in GChemPaint)
         def draw(xml, specie_index)
