@@ -4,7 +4,7 @@ module VersatileDiamond
     # Provides general information about elementary fragment of present lattice
     class Node
 
-      attr_accessor :z, :y, :x, :is_visited
+      attr_accessor :z, :y, :x, :is_visited, :atom
 
       # Sets z, y, x coordinates and wheather this node visited or not
       def initialize(*args)
@@ -14,12 +14,14 @@ module VersatileDiamond
           @y = args[0].y
           @x = args[0].x
           @is_visited = args[0].is_visited
+          @atom = args[0].atom
         # constructor with parameters
-        elsif args.size == 4
+        elsif args.size == 5
           @z = args[0]
           @y = args[1]
           @x = args[2]
           @is_visited = args[3]
+          @atom = args[4]
         end
       end
 
@@ -31,6 +33,7 @@ module VersatileDiamond
         return false if @y != node.y
         return false if @x != node.x
         return false if @is_visited != node.is_visited
+        return false if @atom != node.atom
         true
       end
     end

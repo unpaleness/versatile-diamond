@@ -8,7 +8,7 @@ module VersatileDiamond
         include Stereo
 
         attr_reader :atom, :id
-        attr_accessor :x, :y, :z, :bonds
+        attr_accessor :x, :y, :z, :bonds, :node
 
         # Initializer
         # 'atom' is a reference to atoms defined for current spec by Gleb
@@ -18,29 +18,43 @@ module VersatileDiamond
           @atom = atom
           @id = @atom.object_id
           @bonds = {}
+          @node = nil
+          # binding.pry
         end
 
         # Returns symbolic illustration of current atom
+        # @return [String]
         def name
           @atom.name
         end
 
+        # Lets us to receive information about atom in more readable format
+        # @return [String]
+        def to_s
+          res = "id = #{@id}, z = #{@z}, y = #{@y}, x = #{@x}, bonds:\n"
+          @bonds.each do |id_atom_to, bond|
+            res << "#{bond.to_s}\n"
+          end
+          res
+        end
+
         # Moves atom on values dx, dy, dz
-        def move_on_dec(dx, dy, dz)
-          @x += dx
-          @y += dy
+        def move_on_dec(dz, dy, dx)
           @z += dz
+          @y += dy
+          @x += dx
         end
 
         # Moves atom on values dro, dphi, detha
+        # @return [Float, Float, Float]
         def move_on_sph(dro, dphi, detha)
           ro, phi, etha = dec_to_sph(@x, @y, @z)
-          @x, @y, @z = sph_to_dec(ro + dro, phi + dphi, etha + detha)
-          [@x, @y, @z]
+          @z, @y, @x = sph_to_dec(ro + dro, phi + dphi, etha + detha)
+          [@z, @y, @x]
         end
 
         # Rotate relative to the point (x; y; z)
-        def rotate(x, y, z, dphi, detha)
+        def rotate(z, y, x, dphi, detha)
 
         end
       end

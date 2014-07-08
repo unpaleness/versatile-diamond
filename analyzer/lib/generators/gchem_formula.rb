@@ -15,6 +15,8 @@ module VersatileDiamond
         # puts "Class GChemFormula initialized!"
       end
 
+      # Generator
+      # @param [Array]
       def generate(**params)
         # puts "GChemFormula generator now executes!"
         # initializing indexes of species and atoms
@@ -38,7 +40,7 @@ module VersatileDiamond
           end
         end
         File.open("#{@out_path}.gchempaint", 'w') { |f| f.write(xml_stream.to_xml) }
-        binding.pry
+        # binding.pry
       end
     end
 

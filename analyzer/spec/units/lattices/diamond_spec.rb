@@ -116,7 +116,7 @@ describe Diamond do
     [-1, 1].each do |x|
       let(:ml) { MatrixLayout.new }
       let(:counted_node) { ml.nodes[0][0][x] }
-      let(:result_node) { Node.new(0.0, 0.0, subject.dx * x, false) }
+      let(:result_node) { Node.new(0.0, 0.0, subject.dx * x, false, nil) }
       before { subject.extend_front_100(ml, x) }
       it { expect(counted_node).to eq(result_node) }
     end
@@ -126,7 +126,7 @@ describe Diamond do
     [-1, 1].each do |y|
       let(:ml) { MatrixLayout.new }
       let(:counted_node) { ml.nodes[0][y][0] }
-      let(:result_node) { Node.new(0.0, subject.dy * y, 0.0, false) }
+      let(:result_node) { Node.new(0.0, subject.dy * y, 0.0, false, nil) }
       before { subject.extend_cross_100(ml, y) }
       it { expect(counted_node).to eq(result_node) }
     end
@@ -135,7 +135,7 @@ describe Diamond do
   describe '#extend_front_110' do
     let(:ml) { MatrixLayout.new }
     let(:counted_node) { ml.nodes[1][0][-1] }
-    let(:result_node) { Node.new(subject.dz, 0.0, - subject.dx / 2, false) }
+    let(:result_node) { Node.new(subject.dz, 0.0, - subject.dx / 2, false, nil) }
     before { subject.extend_front_110(ml) }
     it { expect(counted_node).to eq(result_node) }
   end
@@ -143,7 +143,7 @@ describe Diamond do
   describe '#extend_cross_110' do
     let(:ml) { MatrixLayout.new }
     let(:counted_node) { ml.nodes[-1][-1][0] }
-    let(:result_node) { Node.new(- subject.dz, - subject.dy / 2, 0.0, false) }
+    let(:result_node) { Node.new(- subject.dz, - subject.dy / 2, 0.0, false, nil) }
     before { subject.extend_cross_110(ml) }
     it { expect(counted_node).to eq(result_node) }
   end

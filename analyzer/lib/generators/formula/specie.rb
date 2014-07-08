@@ -6,8 +6,9 @@ module VersatileDiamond
       class Specie
 
         include Stereo
+        include VersatileDiamond::Lattice
 
-        attr_reader :spec, :atoms_amount, :bonds_amount, :atoms, :bonds
+        attr_reader :spec, :atoms_amount, :bonds_amount, :atoms, :bonds, :lattice
 
         BOND_LENGTH = 140
 
@@ -16,7 +17,8 @@ module VersatileDiamond
           @atoms_amount = collect_atoms
           @bonds_amount = collect_bonds
           bind_bonds_and_atoms
-          # binding.pry
+          @lattice = MatrixLayout.new
+          binding.pry
         end
 
         # Collects all atoms to appropriate hash
@@ -45,20 +47,20 @@ module VersatileDiamond
             id_atom = key.object_id
             # adding bonds to array of bonds
             (0...(pairs.count)).each do |i|
-              # firstly candidate bond marked as not created
-              already_created = false
-              # checking for bond to be identical to someone previous
-              # if so add +1 to its order
-              (0...bond_index).each do |j|
-                # checking implements throuth comparision of begin and end atoms of
-                # bonds
-                if @bonds[j].id_atom_begin == id_atom &&
-                  @bonds[j].id_atom_end == pairs[i][0].object_id
-                  @bonds[j].order += 1
-                  # mark candidate bond as created
-                  already_created = true
-                end
-              end
+              # # firstly candidate bond marked as not created
+              # already_created = false
+              # # checking for bond to be identical to someone previous
+              # # if so add +1 to its order
+              # (0...bond_index).each do |j|
+              #   # checking implements throuth comparision of begin and end atoms of
+              #   # bonds
+              #   if @bonds[j].id_atom_begin == id_atom &&
+              #     @bonds[j].id_atom_end == pairs[i][0].object_id
+              #     @bonds[j].order += 1
+              #     # mark candidate bond as created
+              #     already_created = true
+              #   end
+              # end
               # create a new candidate bond if it was not created
               if !already_created(@bonds, pairs, bond_index, i, id_atom)
                 @bonds[bond_index] =
@@ -74,11 +76,9 @@ module VersatileDiamond
         def bind_bonds_and_atoms
           @atoms.each do |id, atom|
             @bonds.each do |bond|
+              # if current atom id as equal to atom id of begin of bond
               if id == bond.id_atom_begin then
                 atom.bonds[bond.id_atom_end] = bond
-              end
-              if id == bond.id_atom_end then
-                atom.bonds[bond.id_atom_begin] = bond
               end
             end
           end
@@ -102,27 +102,25 @@ module VersatileDiamond
               # mark candidate bond as created
               is_created = true
             end
-            # checking for reverse to some bond; if so just mark bond as already
-            # created without incrementing order
-            if @bonds[j].id_atom_begin == pairs[pair_index][0].object_id &&
-              @bonds[j].id_atom_end == id_atom
-              # mark candidate bond as created
-              is_created = true
-            end
           end
           is_created
         end
 
         # Translates info about spec into string
+        # @return [String]
         def to_s
           result = "#{@spec.name}\n"
           @atoms.each do |id_atom, atom|
-            result << " #{id_atom}\n"
-            atom.bonds.each do |id_atom_dest, bond|
-              result << "  #{id_atom_dest}: #{bond.description}\n"
-            end
+            result << " #{atom.to_s}"
           end
           result
+        end
+
+        # Locates atoms' positions on the lattice
+        def locate_atoms_to_lattice
+          @atoms.each do |id, atom|
+
+          end
         end
 
         # Draws a specie.

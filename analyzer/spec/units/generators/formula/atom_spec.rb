@@ -10,9 +10,15 @@ module VersatileDiamond
 
         describe '#move_on_sph' do
           [
-            [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], [0.0, 0.0, 0.0]]
+            [[0.0, 0.0, 0.0], [1.0, Math::PI / 2, Math::PI / 2], [0.0, 0.0, 1.0]],
+
+            [[0.0, 0.0, 0.0], [1.0, Math::PI / 4, Math::asin(Math::sqrt(1.0 / 3.0))],
+            [Math::sqrt(1.0 / 3.0), Math::sqrt(1.0 / 3.0), Math::sqrt(1.0 / 3.0)]],
+
+            [[0.0, 0.0, 0.0], [1.0, -Math::PI / 4, -Math::asin(Math::sqrt(1.0 / 3.0))],
+            [-Math::sqrt(1.0 / 3.0), -Math::sqrt(1.0 / 3.0), Math::sqrt(1.0 / 3.0)]]
           ].each do |coordinates, difference, answer|
-            before { subject.x, subject.y, subject.z = coordinates }
+            before { subject.z, subject.y, subject.x = coordinates }
             let(:result) { subject.move_on_sph(*difference) }
             let(:rounded_result) { result.map(&round_lambda) }
             let(:rounded_answer) { answer.map(&round_lambda) }
