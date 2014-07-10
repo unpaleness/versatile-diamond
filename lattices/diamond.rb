@@ -128,12 +128,14 @@ public
   def coords(matrix_layout, atom)
     node = matrix_layout[atom]
     node.atom.z = node.z * dz
-    node.atom.y = dy * (node.y + (node.z / 2.0).truncate)
-    node.atom.x = dx * (node.x + (node.z / 2.0).truncate)
-    if node.z % 2 == 1
-      node.atom.y -= dx / 2 if node.z < 0
-      node.atom.x += dy / 2 if node.z > 0
-    end
+    node.atom.y = dy * (node.y + 0.5 * (node.z + 1) / 2)
+    node.atom.x = dx * (node.x + 0.5 * (node.z / 2))
+    # node.atom.y = dy * (node.y + 0.5 * (node.z / 2.0).truncate)
+    # node.atom.x = dx * (node.x + 0.5 * (node.z / 2.0).truncate)
+    # if node.z % 2 == 1
+    #   node.atom.y += dy / 2 if node.z > 0
+    #   node.atom.x -= dx / 2 if node.z < 0
+    # end
   end
 
 end

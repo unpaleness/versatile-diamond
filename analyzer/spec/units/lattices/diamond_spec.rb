@@ -131,26 +131,29 @@ describe Diamond do
   describe '#{coords}' do
     let(:ml) { MatrixLayout.new }
     let(:atoms) { {} }
-    let(:sample_atom) { Atom.new(111) }
+    let(:sample_atom) { Atom.new(333) }
     before do
-      (-1..1).each do |z|
+      (0..3).each do |z|
         atoms[z] = {}
-        (-1..1).each do |y|
+        (0..3).each do |y|
           atoms[z][y] = {}
-          (-1..1).each do |x|
+          (0..3).each do |x|
             atoms[z][y][x] = Atom.new(z * 100 + y * 10 + x)
             ml[z, y, x] = atoms[z][y][x]
             subject.coords(ml, atoms[z][y][x])
+            atoms[z][y][x].z = rounding(atoms[z][y][x].z)
+            atoms[z][y][x].y = rounding(atoms[z][y][x].y)
+            atoms[z][y][x].x = rounding(atoms[z][y][x].x)
             # puts ml[z, y, x]
           end
         end
       end
-      sample_atom.z = subject.send(:dz)
-      sample_atom.y = subject.send(:dy)
-      sample_atom.x = subject.send(:dx) * 1.5
+      sample_atom.z = rounding(subject.send(:dz) * 3.0)
+      sample_atom.y = rounding(subject.send(:dy) * 4.0)
+      sample_atom.x = rounding(subject.send(:dx) * 3.5)
     end
 
-    it { expect(atoms[1][1][1]).to eq(sample_atom) }
+    it { expect(atoms[3][3][3]).to eq(sample_atom) }
   end
 
 end

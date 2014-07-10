@@ -18,7 +18,7 @@ module VersatileDiamond
           @bonds_amount = collect_bonds
           bind_bonds_and_atoms
           @lattice = MatrixLayout.new
-          binding.pry
+          # binding.pry
         end
 
         # Collects all atoms to appropriate hash
