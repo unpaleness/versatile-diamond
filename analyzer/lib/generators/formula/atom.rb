@@ -28,6 +28,14 @@ module VersatileDiamond
           @atom.name
         end
 
+        def ==(other_atom)
+          return false if @id != other_atom.id
+          return false if @z != other_atom.z
+          return false if @y != other_atom.y
+          return false if @x != other_atom.x
+          true
+        end
+
         # Lets us to receive information about atom in more readable format
         # @return [String]
         def to_s

@@ -28,10 +28,32 @@ module VersatileDiamond
               end
             end
           end
+          raise ArgumentError, 'Lattice doesn\'t contain this atom.'
+        # if there are three arguments they are coordinates
         elsif args.size == 3
+          # we should be sure that our lattice contain this node
+          # checking z-range
+          while args[0] < @bz[0] do extend_cross_110 end
+          while args[0] > @bz[1] do extend_front_110 end
+          # checking y-range
+          while args[1] < @by[0] do extend_front_100(-1) end
+          while args[1] > @by[1] do extend_front_100(1) end
+          # checking y-range
+          while args[2] < @bx[0] do extend_cross_100(-1) end
+          while args[2] > @bx[1] do extend_cross_100(1) end
           return @nodes[args[0]][args[1]][args[2]]
         end
         nil
+      end
+
+      # Lets us to set an atom in accordance to node
+      # @param [Array, Atom]
+      # @return [Node]
+      def []=(z, y, x, atom)
+        node = self[z, y, x]
+        # node ? (node.atom = atom) : (return nil)
+        node.atom = atom
+        node
       end
 
       # Lets us sort out every node in our layout
@@ -49,11 +71,12 @@ module VersatileDiamond
       # @param [Integer] direction (-1 - forward or 1 - backward)
       def extend_front_100(dir)
         # making 0, 1 from -1, 1 =)
-        @bx[(dir + 1) / 2] += dir
-        x_new = @bx[(dir + 1) / 2]
+        @by[(dir + 1) / 2] += dir
+        y_new = @by[(dir + 1) / 2]
         (@bz[0]..@bz[1]).each do |z|
-          (@by[0]..@by[1]).each do |y|
-            @nodes[z][y][x_new] = Node.new(z, y, x_new, false, nil)
+          @nodes[z][y_new] = {}
+          (@bx[0]..@bx[1]).each do |x|
+            @nodes[z][y_new][x] = Node.new(z, y_new, x, false, nil)
           end
         end
       end
@@ -68,12 +91,11 @@ module VersatileDiamond
       # @param [Integer] direction (-1 - forward or 1 - backward)
       def extend_cross_100(dir)
         # making 0, 1 from -1, 1 =)
-        @by[(dir + 1) / 2] += dir
-        y_new = @by[(dir + 1) / 2]
+        @bx[(dir + 1) / 2] += dir
+        x_new = @bx[(dir + 1) / 2]
         (@bz[0]..@bz[1]).each do |z|
-          @nodes[z][y_new] = {}
-          (@bx[0]..@bx[1]).each do |x|
-            @nodes[z][y_new][x] = Node.new(z, y_new, x, false, nil)
+          (@by[0]..@by[1]).each do |y|
+            @nodes[z][y][x_new] = Node.new(z, y, x_new, false, nil)
           end
         end
       end
@@ -94,10 +116,12 @@ module VersatileDiamond
         (@by[0]..@by[1]).each do |y|
           @nodes[@bz[1]][y] = {}
           (@bx[0]..@bx[1]).each do |x|
-            @nodes[@bz[1]][y][x] = Node.new(@bz[1] - 1, y, x, false, nil)
+            @nodes[@bz[1]][y][x] = Node.new(@bz[1], y, x, false, nil)
           end
         end
-        extend_front_100(-1)
+        if @bz[1] % 2 == 1 then extend_front_100(-1)
+        else extend_cross_100(-1)
+        end
       end
 
       # Extend matrix layout by one bond by direction cross_110
@@ -109,10 +133,12 @@ module VersatileDiamond
         (@by[0]..@by[1]).each do |y|
           @nodes[@bz[0]][y] = {}
           (@bx[0]..@bx[1]).each do |x|
-            @nodes[@bz[0]][y][x] = Node.new(@bz[0] + 1, y, x, false, nil)
+            @nodes[@bz[0]][y][x] = Node.new(@bz[0], y, x, false, nil)
           end
         end
-        extend_cross_100(-1)
+        if @bz[1] % 2 == 1 then extend_cross_100(-1)
+        else extend_front_100(-1)
+        end
       end
     end
 

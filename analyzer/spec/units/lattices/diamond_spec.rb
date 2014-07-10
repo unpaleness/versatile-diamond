@@ -4,8 +4,12 @@ describe Diamond do
 
   Node = VersatileDiamond::Lattice::Node
   MatrixLayout = VersatileDiamond::Lattice::MatrixLayout
+  Atom = VersatileDiamond::Generators::Formula::Atom
 
   subject(:diamond) { described_class.new }
+  def rounding(x)
+    x.round(14)
+  end
 
   describe '#opposite_relation' do
     describe 'same lattice' do
@@ -106,6 +110,47 @@ describe Diamond do
         it { expect(diamond.positions_between(cd2, cd4, links)).to be_nil }
       end
     end
+  end
+
+  describe '#{bond_length}' do
+    it { expect(rounding(subject.send(:bond_length))).to eq(1.54e-10) }
+  end
+
+  describe '#{dx}' do
+    it { expect(rounding(subject.send(:dx))).to eq(2.5148e-10) }
+  end
+
+  describe '#{dy}' do
+    it { expect(rounding(subject.send(:dy))).to eq(2.5148e-10) }
+  end
+
+  describe '#{dz}' do
+    it { expect(rounding(subject.send(:dz))).to eq(8.891e-11) }
+  end
+
+  describe '#{coords}' do
+    let(:ml) { MatrixLayout.new }
+    let(:atoms) { {} }
+    let(:sample_atom) { Atom.new(111) }
+    before do
+      (-1..1).each do |z|
+        atoms[z] = {}
+        (-1..1).each do |y|
+          atoms[z][y] = {}
+          (-1..1).each do |x|
+            atoms[z][y][x] = Atom.new(z * 100 + y * 10 + x)
+            ml[z, y, x] = atoms[z][y][x]
+            subject.coords(ml, atoms[z][y][x])
+            # puts ml[z, y, x]
+          end
+        end
+      end
+      sample_atom.z = subject.send(:dz)
+      sample_atom.y = subject.send(:dy)
+      sample_atom.x = subject.send(:dx) * 1.5
+    end
+
+    it { expect(atoms[1][1][1]).to eq(sample_atom) }
   end
 
 end

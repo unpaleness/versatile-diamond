@@ -43,8 +43,8 @@ module VersatileDiamond
       # Converts Node to string-format for debugging
       # @return [String]
       def to_s
-        "node parameters:\nz = #{@z}, y = #{@y}, x = #{@x}, "\
-          "is visited? - #{is_visited}\natom parameters:\n#{@atom.to_s}"
+        "z = #{@z}, y = #{@y}, x = #{@x}, "\
+          "is visited? - #{is_visited}, atom: #{@atom}"
       end
     end
 
