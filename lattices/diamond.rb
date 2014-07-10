@@ -102,8 +102,6 @@ private
     }
   end
 
-public
-
   # @return [Float] a length of bond o_O
   def bond_length
     1.54e-10
@@ -124,82 +122,18 @@ public
     bond_length * Math::sqrt(1.0 / 3.0)
   end
 
-  # Extend matrix layout by one bond by direction front_100
-  # @param [MatrixLayout, Integer] our matrix layout and direction (-1 - forward or
-  # 1 - backward)
-  def extend_front_100(ml, dir)
-    # making 0, 1 from -1, 1 =)
-    ml.bx[(dir + 1) / 2] += dir
-    x_new = ml.bx[(dir + 1) / 2]
-    (ml.bz[0]..ml.bz[1]).each do |z|
-      (ml.by[0]..ml.by[1]).each do |y|
-        ml.nodes[z][y][x_new] = Node.new(ml.nodes[z][y][x_new - dir])
-        ml.nodes[z][y][x_new].x += dx * dir
-      end
+public
+
+  # Lets us to count coordinates of atom on MatrixLayout
+  def coords(matrix_layout, atom)
+    node = matrix_layout[atom]
+    node.atom.z = node.z * dz
+    node.atom.y = dy * (y + z / 2)
+    node.atom.x = dx * (x + z / 2)
+    if node.z % 2 == 1
+      node.atom.y -= dy / 2 if node.z < 0
+      node.atom.y += dx / 2 if node.z > 0
     end
   end
 
-  # Extend matrix layout by one bond by all directions front_100
-  # @param [MatrixLayout] our matrix layout
-  def extend_front_100_all(ml)
-    extend_front_100(ml, -1)
-    extend_front_100(ml, 1)
-  end
-
-  # Extend matrix layout by one bond by direction cross_100
-  # @param [MatrixLayout, Integer] our matrix layout and direction (-1 - forward or
-  # 1 - backward)
-  def extend_cross_100(ml, dir)
-    # making 0, 1 from -1, 1 =)
-    ml.by[(dir + 1) / 2] += dir
-    y_new = ml.by[(dir + 1) / 2]
-    (ml.bz[0]..ml.bz[1]).each do |z|
-      ml.nodes[z][y_new] = {}
-      (ml.bx[0]..ml.bx[1]).each do |x|
-        ml.nodes[z][y_new][x] = Node.new(ml.nodes[z][y_new - dir][x])
-        ml.nodes[z][y_new][x].y += dy * dir
-      end
-    end
-  end
-
-  # Extend matrix layout by one bond by all directions cross_100
-  # @param [MatrixLayout] our matrix layout
-  def extend_cross_100_all(ml)
-    extend_cross_100(ml, -1)
-    extend_cross_100(ml, 1)
-  end
-
-  # Extend matrix layout by one bond by direction front_110
-  # Using this method causes extending x backwards on 1 atom!
-  # @param [MatrixLayout] our matrix layout
-  def extend_front_110(ml)
-    ml.bz[1] += 1
-    ml.nodes[ml.bz[1]] = {}
-    (ml.by[0]..ml.by[1]).each do |y|
-      ml.nodes[ml.bz[1]][y] = {}
-      (ml.bx[0]..ml.bx[1]).each do |x|
-        ml.nodes[ml.bz[1]][y][x] = Node.new(ml.nodes[ml.bz[1] - 1][y][x])
-        ml.nodes[ml.bz[1]][y][x].z += dz
-        ml.nodes[ml.bz[1]][y][x].x += dx / 2
-      end
-    end
-    extend_front_100(ml, -1)
-  end
-
-  # Extend matrix layout by one bond by direction cross_110
-  # Using this method causes extending y backwards on 1 atom!
-  # @param [MatrixLayout] our matrix layout
-  def extend_cross_110(ml)
-    ml.bz[0] -= 1
-    ml.nodes[ml.bz[0]] = {}
-    (ml.by[0]..ml.by[1]).each do |y|
-      ml.nodes[ml.bz[0]][y] = {}
-      (ml.bx[0]..ml.bx[1]).each do |x|
-        ml.nodes[ml.bz[0]][y][x] = Node.new(ml.nodes[ml.bz[0] + 1][y][x])
-        ml.nodes[ml.bz[0]][y][x].z -= dz
-        ml.nodes[ml.bz[0]][y][x].y += dy / 2
-      end
-    end
-    extend_cross_100(ml, -1)
-  end
 end

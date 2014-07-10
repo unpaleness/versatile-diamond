@@ -7,6 +7,8 @@ module VersatileDiamond
       attr_accessor :z, :y, :x, :is_visited, :atom
 
       # Sets z, y, x coordinates and wheather this node visited or not
+      # ATTENTION!!! z, y, x ARE RELATIVE COORDINATES!!!
+      # real coordinates a stored in @atom
       def initialize(*args)
         # constructor of copying
         if args.size == 1
@@ -29,12 +31,20 @@ module VersatileDiamond
       # @param [Node] node to compare with current one
       # @return [Boolean] is or not identical
       def ==(node)
+        return false if node.class == nil.class
         return false if @z != node.z
         return false if @y != node.y
         return false if @x != node.x
         return false if @is_visited != node.is_visited
         return false if @atom != node.atom
         true
+      end
+
+      # Converts Node to string-format for debugging
+      # @return [String]
+      def to_s
+        "node parameters:\nz = #{@z}, y = #{@y}, x = #{@x}, "\
+          "is visited? - #{is_visited}\natom parameters:\n#{@atom.to_s}"
       end
     end
 
