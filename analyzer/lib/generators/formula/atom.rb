@@ -8,7 +8,7 @@ module VersatileDiamond
         include Stereo
 
         attr_reader :atom, :id
-        attr_accessor :x, :y, :z, :bonds, :node
+        attr_accessor :x, :y, :z, :id, :bonds, :node
 
         # Initializer
         # 'atom' is a reference to atoms defined for current spec by Gleb
@@ -29,6 +29,7 @@ module VersatileDiamond
         end
 
         def ==(other_atom)
+          return false if other_atom == nil
           return false if @id != other_atom.id
           return false if @z != other_atom.z
           return false if @y != other_atom.y

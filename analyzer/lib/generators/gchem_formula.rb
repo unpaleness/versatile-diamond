@@ -5,7 +5,7 @@ module VersatileDiamond
     # GChemPaint
     class GChemFormula < BaseDaughter
 
-      SPACE_Y = 200
+      SPACE_Y = 400
       SPACE_X = 100
 
       # @override
@@ -29,11 +29,11 @@ module VersatileDiamond
             # for every specie in our model
             specific_surface_specs.each do |dep_spec|
               # 'if' condition should be removed
-              # if specie_index == 2
+              if specie_index == 1
                 # adding specie
                 @species[specie_index] = Formula::Specie.new(dep_spec.spec)
-                @species[specie_index].draw(xml, specie_index)
-              # end
+                @species[specie_index].draw(xml, specie_index, SPACE_Y * specie_index)
+              end
               # incrementing specie index
               specie_index += 1
             end

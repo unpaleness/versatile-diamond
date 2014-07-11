@@ -28,7 +28,7 @@ class Diamond < VersatileDiamond::Lattices::Base
 
 private
 
-  Node = VersatileDiamond::Lattice::Node
+  # Node = VersatileDiamond::Lattice::Node
 
   # Detects opposite relation on same lattice
   # @param [Concepts::Bond] the relation between atoms in lattice
@@ -103,39 +103,33 @@ private
   end
 
   # @return [Float] a length of bond o_O
-  def bond_length
+  def self.bond_length
     1.54e-10
   end
 
   # @return [Float] a shift along x-axis
-  def dx
+  def self.dx
     bond_length * Math::sqrt(8.0 / 3.0)
   end
 
   # @return [Float] a shift along y-axis
-  def dy
+  def self.dy
     bond_length * Math::sqrt(8.0 / 3.0)
   end
 
   # @return [Float] a shift along z-axis
-  def dz
+  def self.dz
     bond_length * Math::sqrt(1.0 / 3.0)
   end
 
 public
 
   # Lets us to count coordinates of atom on MatrixLayout
-  def coords(matrix_layout, atom)
+  def self.coords(matrix_layout, atom)
     node = matrix_layout[atom]
     node.atom.z = node.z * dz
     node.atom.y = dy * (node.y + 0.5 * (node.z + 1) / 2)
     node.atom.x = dx * (node.x + 0.5 * (node.z / 2))
-    # node.atom.y = dy * (node.y + 0.5 * (node.z / 2.0).truncate)
-    # node.atom.x = dx * (node.x + 0.5 * (node.z / 2.0).truncate)
-    # if node.z % 2 == 1
-    #   node.atom.y += dy / 2 if node.z > 0
-    #   node.atom.x -= dx / 2 if node.z < 0
-    # end
   end
 
 end

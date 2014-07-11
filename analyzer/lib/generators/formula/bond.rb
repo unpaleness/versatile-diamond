@@ -6,15 +6,15 @@ module VersatileDiamond
       class Bond
 
         # Opens 1-st and 2-nd atoms and bond for reading
-        attr_reader :id_atom_begin, :id_atom_end, :bond
+        attr_reader :atom_begin, :atom_end, :bond
         # Opens access to 'order'
         attr_accessor :order
 
         # Initializer
         # 'order' - order of the bond
-        def initialize(id_atom_begin, id_atom_end, bond)
-          @id_atom_begin = id_atom_begin
-          @id_atom_end = id_atom_end
+        def initialize(atom_begin, atom_end, bond)
+          @atom_begin = atom_begin
+          @atom_end = atom_end
           @bond = bond
           # initial order is always 1
           @order = 1
@@ -30,7 +30,7 @@ module VersatileDiamond
         # Returns a string with detailed information about current bond
         # @return [String]
         def to_s
-          "from: #{@id_atom_begin}, to: #{@id_atom_end}, order = #{order}, "\
+          "from: #{@atom_begin.id}, to: #{@atom_end.id}, order = #{order}, "\
             "face: #{@bond.face}, dir: #{@bond.dir}, is bond? - #{is_bond?}"
         end
 

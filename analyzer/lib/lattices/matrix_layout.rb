@@ -28,7 +28,7 @@ module VersatileDiamond
               end
             end
           end
-          raise ArgumentError, 'Lattice doesn\'t contain this atom.'
+          # raise ArgumentError, 'Lattice doesn\'t contain this atom.'
         # if there are three arguments they are coordinates
         elsif args.size == 3
           # we should be sure that our lattice contain this node
@@ -106,57 +106,58 @@ module VersatileDiamond
         (@bz[0]..@bz[1]).each do |z|
           (@by[0]..@by[1]).each do |y|
             @nodes[z][y][x_new] = Node.new(z, y, x_new, false, nil)
-            end
           end
         end
       end
 
-    # /***************************************************\
-    # | METHODS-ITERATORS FOR ACCESSING TO NODES BY BONDS |
-    # \***************************************************/
+      # /***************************************************\
+      # | METHODS-ITERATORS FOR ACCESSING TO NODES BY BONDS |
+      # \***************************************************/
 
-    # Allows us to access to node by bond front_100
-    # @param [Node] current node
-    # @return [Node, Node] next nodes
-    def front_100(node)
-      if node.z % 2 == 0
-        [@nodes[node.z][node.y - 1][node.x], @nodes[node.z][node.y + 1][node.x]]
-      else
-        [@nodes[node.z][node.y][node.x - 1], @nodes[node.z][node.y][node.x + 1]]
+      # Allows us to access to node by bond front_100
+      # @param [Node] current node
+      # @return [Node, Node] next nodes
+      def front_100(node)
+        if node.z % 2 == 0
+          [self[node.z, node.y - 1, node.x], self[node.z, node.y + 1, node.x]]
+        else
+          [self[node.z, node.y, node.x - 1], self[node.z, node.y, node.x + 1]]
+        end
+      end
+
+      # Allows us to access to node by bond cross_100
+      # @param [Node] current node
+      # @return [Node, Node] next nodes
+      def cross_100(node)
+        if node.z % 2 == 0
+          [self[node.z, node.y, node.x - 1], self[node.z, node.y, node.x + 1]]
+        else
+          [self[node.z, node.y - 1, node.x], self[node.z, node.y + 1, node.x]]
+        end
+      end
+
+      # Allows us to access to node by bond front_110
+      # @param [Node] current node
+      # @return [Node, Node] next nodes
+      def front_110(node)
+        if node.z % 2 == 0
+          [self[node.z + 1, node.y - 1, node.x], self[node.z + 1, node.y, node.x]]
+        else
+          [self[node.z + 1, node.y, node.x - 1], self[node.z + 1, node.y, node.x]]
+        end
+      end
+
+      # Allows us to access to node by bond cross_110
+      # @param [Node] current node
+      # @return [Node, Node] next nodes
+      def cross_110(node)
+        if node.z % 2 == 0
+          [self[node.z - 1, node.y, node.x], self[node.z - 1, node.y, node.x + 1]]
+        else
+          [self[node.z - 1, node.y, node.x], self[node.z - 1, node.y + 1, node.x]]
+        end
       end
     end
 
-    # Allows us to access to node by bond cross_100
-    # @param [Node] current node
-    # @return [Node, Node] next nodes
-    def cross_100(node)
-      if node.z % 2 == 0
-        [@nodes[node.z][node.y][node.x - 1], @nodes[node.z][node.y][node.x + 1]]
-      else
-        [@nodes[node.z][node.y - 1][node.x], @nodes[node.z][node.y + 1][node.x]]
-      end
-    end
-
-    # Allows us to access to node by bond front_110
-    # @param [Node] current node
-    # @return [Node, Node] next nodes
-    def front_110(node)
-      if node.z % 2 == 0
-        [@nodes[node.z + 1][node.y - 1][node.x], @nodes[node.z + 1][node.y][node.x]]
-      else
-        [@nodes[node.z + 1][node.y][node.x - 1], @nodes[node.z + 1][node.y][node.x]]
-      end
-    end
-
-    # Allows us to access to node by bond cross_110
-    # @param [Node] current node
-    # @return [Node, Node] next nodes
-    def cross_110(node)
-      if node.z % 2 == 0
-        [@nodes[node.z - 1][node.y][node.x], @nodes[node.z - 1][node.y][node.x + 1]]
-      else
-        [@nodes[node.z - 1][node.y][node.x], @nodes[node.z - 1][node.y + 1][node.x]]
-      end
-    end
   end
 end

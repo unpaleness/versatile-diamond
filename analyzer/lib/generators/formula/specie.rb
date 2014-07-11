@@ -17,7 +17,9 @@ module VersatileDiamond
           @atoms_amount = collect_atoms
           @bonds_amount = collect_bonds
           bind_bonds_and_atoms
-          @lattice = MatrixLayout.new
+          @matlay = MatrixLayout.new
+          @matlay[0, 0, 0].atom = @atoms.first[1]
+          spread(@atoms.first[1], 10)
           # binding.pry
         end
 
@@ -28,10 +30,8 @@ module VersatileDiamond
           atom_index = 0
           # process every record in this hash
           @spec.links.each do |key, pairs|
-            # id of current atom
-            id_atom = key.object_id
             # adding an atom to hash with object.id as a key
-            @atoms[id_atom] = Formula::Atom.new(key)
+            @atoms[key] = Formula::Atom.new(key)
             atom_index += 1
           end
           atom_index
@@ -44,27 +44,12 @@ module VersatileDiamond
           bond_index = 0
           # process every record in this hash
           @spec.links.each do |key, pairs|
-            id_atom = key.object_id
             # adding bonds to array of bonds
             (0...(pairs.count)).each do |i|
-              # # firstly candidate bond marked as not created
-              # already_created = false
-              # # checking for bond to be identical to someone previous
-              # # if so add +1 to its order
-              # (0...bond_index).each do |j|
-              #   # checking implements throuth comparision of begin and end atoms of
-              #   # bonds
-              #   if @bonds[j].id_atom_begin == id_atom &&
-              #     @bonds[j].id_atom_end == pairs[i][0].object_id
-              #     @bonds[j].order += 1
-              #     # mark candidate bond as created
-              #     already_created = true
-              #   end
-              # end
               # create a new candidate bond if it was not created
-              if !already_created(@bonds, pairs, bond_index, i, id_atom)
+              if !already_created(@atoms, @bonds, pairs, bond_index, i, key)
                 @bonds[bond_index] =
-                  Formula::Bond.new(id_atom, pairs[i][0].object_id, pairs[i][1])
+                  Formula::Bond.new(@atoms[key], @atoms[pairs[i][0]], pairs[i][1])
                 bond_index += 1
               end
             end
@@ -74,11 +59,11 @@ module VersatileDiamond
 
         # Adds references to bonds to every atom
         def bind_bonds_and_atoms
-          @atoms.each do |id, atom|
+          @atoms.each do |atom, atom_wide|
             @bonds.each do |bond|
               # if current atom id as equal to atom id of begin of bond
-              if id == bond.id_atom_begin then
-                atom.bonds[bond.id_atom_end] = bond
+              if atom_wide.id == bond.atom_begin.id then
+                atom_wide.bonds[bond.atom_end] = bond
               end
             end
           end
@@ -88,7 +73,7 @@ module VersatileDiamond
         # in case of duplication
         # Reverse bonds are going to be removed completely!!!
         # @return [Logical] true/false value
-        def already_created(bonds, pairs, bond_index, pair_index, id_atom)
+        def already_created(atoms, bonds, pairs, bond_index, pair_index, atom)
           # firstly candidate bond marked as not created
           is_created = false
           # checking for bond to be identical to someone previous
@@ -96,8 +81,8 @@ module VersatileDiamond
           (0...bond_index).each do |j|
             # checking implements throuth comparision of begin and end atoms of
             # bonds
-            if @bonds[j].id_atom_begin == id_atom &&
-              @bonds[j].id_atom_end == pairs[pair_index][0].object_id
+            if @bonds[j].atom_begin == atoms[atom] &&
+              @bonds[j].atom_end == atoms[pairs[pair_index][0]]
               @bonds[j].order += 1
               # mark candidate bond as created
               is_created = true
@@ -116,27 +101,73 @@ module VersatileDiamond
           result
         end
 
-        # Locates atoms' positions on the lattice
-        def locate_atoms_to_lattice
-          @atoms.each do |id, atom|
-
+        # Recursively locates atoms' positions on the lattice
+        # @param [Atom, Integer] considarating atom and iteration limit
+        # @return [Boolean] either was spreading successful or not
+        def spread(atom, iter)
+          return false if iter == 0
+          result = true
+          # enumerate all bonds of current atom
+          atom.bonds.each do |atom_end, bond|
+            # shows wheather our journey is successful
+            loop_success = false
+            # if destination atom belongs to lattice
+            if atom_end.atom.lattice != nil
+              # shows either there are some free nodes or not
+              are_free_nodes = false
+              # check for free nodes and if there is desired atom_end in lattice
+              @matlay.send("#{bond.bond.dir}_#{bond.bond.face}", @matlay[atom]).each do |node|
+                loop_success = true if node.atom == atom_end
+                are_free_nodes = true if node.atom == nil
+              end
+              # if loop is not closed and there are som free nodes try it
+              if loop_success == false && are_free_nodes == true
+                # for every destination of bond
+                @matlay.send("#{bond.bond.dir}_#{bond.bond.face}", @matlay[atom]).each do |node|
+                  # if node is free
+                  if node.atom == nil
+                    # assumption that atom should be here
+                    node.atom = atom_end
+                    # checking this assumption
+                    if spread(atom_end, iter - 1)
+                      loop_success = true
+                    else
+                      # if assumption has not justified
+                      node.atom = nil
+                    end
+                  end
+                end
+              end
+            # otherwise, if destination is free-flying atom we should do something
+            # another *__*
+            else
+              #
+              # juicy code
+              #
+            end
+            result = false if loop_success == false
           end
+          VersatileDiamond::Lattices::Base::Diamond::coords(@matlay, atom) if result == true
+          result
         end
 
         # Draws a specie.
         # Input:
         #  - XML stream
         #  - current index of specie (or 'molecule' in GChemPaint)
-        def draw(xml, specie_index)
+        def draw(xml, specie_index, shift_y)
           xml.molecule('id' => specie_index) do
-            @atoms.each do |id, atom|
-              xml.atom('id' => atom.id, 'element' => atom.name) do
-                xml.position('x' => 100, 'y' => 100)
+            @atoms.each do |atom, atom_wide|
+              xml.atom('id' => atom_wide.id, 'element' => atom_wide.name) do
+                # A very armored concrete. Holy inquisition is on the way.
+                xml.position('x' => atom_wide.x * 10e11 + 200, 'y' => atom_wide.y * 10e11 + shift_y)
               end
             end
             (0...@bonds_amount).each do |i|
-              xml.bond('id' => "b#{i}", 'order' => @bonds[i].order,
-                'begin' => @bonds[i].id_atom_begin, 'end' => @bonds[i].id_atom_end)
+              if @bonds[i].is_bond?
+                xml.bond('id' => "b#{i}", 'order' => @bonds[i].order,
+                  'begin' => @bonds[i].atom_begin.id, 'end' => @bonds[i].atom_end.id)
+              end
             end
           end
         end
