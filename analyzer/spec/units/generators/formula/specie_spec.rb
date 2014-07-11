@@ -2,9 +2,8 @@ module VersatileDiamond
   module Generators
     module Formula
 
-      module Stereo
-
-
+      describe Specie do
+        subject(:specie) { Specie.new }
       end
 
     end

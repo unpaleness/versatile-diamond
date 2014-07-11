@@ -47,24 +47,18 @@ module VersatileDiamond
           res
         end
 
-        # Moves atom on values dx, dy, dz
-        def move_on_dec(dz, dy, dx)
-          @z += dz
-          @y += dy
-          @x += dx
-        end
-
-        # Moves atom on values dro, dphi, detha
+        # Rotate relative to the point (z; y; x)
+        # @param [Float, Float, Float, Float, Float] z, y, x, angles of rotation
         # @return [Float, Float, Float]
-        def move_on_sph(dro, dphi, detha)
-          ro, phi, etha = dec_to_sph(@x, @y, @z)
-          @z, @y, @x = sph_to_dec(ro + dro, phi + dphi, etha + detha)
-          [@z, @y, @x]
-        end
-
-        # Rotate relative to the point (x; y; z)
         def rotate(z, y, x, dphi, detha)
-
+          @z -= z
+          @y -= y
+          @x -= x
+          move_on_sph(0, dphi, detha)
+          @z += z
+          @y += y
+          @x += x
+          [@z, @y, @x]
         end
       end
 

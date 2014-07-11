@@ -20,6 +20,7 @@ module VersatileDiamond
           @matlay = MatrixLayout.new
           @matlay[0, 0, 0].atom = @atoms.first[1]
           spread(@atoms.first[1], 10)
+          # rotate(0.0, 0.0, 0.0, 0.0, 0.0)
           # binding.pry
         end
 
@@ -144,11 +145,20 @@ module VersatileDiamond
               #
               # juicy code
               #
+              loop_success = true
             end
             result = false if loop_success == false
           end
           VersatileDiamond::Lattices::Base::Diamond::coords(@matlay, atom) if result == true
           result
+        end
+
+        # Rotates all atoms relative point (x; y; z)
+        # @param [Float, Float, Float, Float, Float] z, y, x, angles of rotation
+        def rotate(z, y, x, dphi, detha)
+          @atoms.each do |key, atom|
+            atom.rotate(z, y, x, dphi, detha)
+          end
         end
 
         # Draws a specie.

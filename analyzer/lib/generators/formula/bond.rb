@@ -33,7 +33,6 @@ module VersatileDiamond
           "from: #{@atom_begin.id}, to: #{@atom_end.id}, order = #{order}, "\
             "face: #{@bond.face}, dir: #{@bond.dir}, is bond? - #{is_bond?}"
         end
-
       end
 
     end
