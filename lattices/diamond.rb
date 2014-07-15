@@ -102,6 +102,8 @@ private
     }
   end
 
+public
+
   # @return [Float] a length of bond o_O
   def self.bond_length
     1.54e-10
@@ -122,13 +124,11 @@ private
     bond_length * Math::sqrt(1.0 / 3.0)
   end
 
-public
-
   # Lets us to count coordinates of atom on MatrixLayout
   def self.coords(matrix_layout, atom)
     node = matrix_layout[atom]
     node.atom.z = node.z * dz
-    node.atom.y = dy * (node.y + 0.5 * (node.z + 1) / 2)
+    node.atom.y = dy * (node.y + 0.5 * ((node.z + 1) / 2))
     node.atom.x = dx * (node.x + 0.5 * (node.z / 2))
   end
 

@@ -113,19 +113,19 @@ describe Diamond do
   end
 
   describe '#{bond_length}' do
-    it { expect(rounding(subject.send(:bond_length))).to eq(1.54e-10) }
+    it { expect(rounding(subject.class.send(:bond_length))).to eq(1.54e-10) }
   end
 
   describe '#{dx}' do
-    it { expect(rounding(subject.send(:dx))).to eq(2.5148e-10) }
+    it { expect(rounding(subject.class.send(:dx))).to eq(2.5148e-10) }
   end
 
   describe '#{dy}' do
-    it { expect(rounding(subject.send(:dy))).to eq(2.5148e-10) }
+    it { expect(rounding(subject.class.send(:dy))).to eq(2.5148e-10) }
   end
 
   describe '#{dz}' do
-    it { expect(rounding(subject.send(:dz))).to eq(8.891e-11) }
+    it { expect(rounding(subject.class.send(:dz))).to eq(8.891e-11) }
   end
 
   describe '#{coords}' do
@@ -133,14 +133,17 @@ describe Diamond do
     let(:atoms) { {} }
     let(:sample_atom) { Atom.new(333) }
     before do
-      (0..3).each do |z|
+      (-3..3).each do |z|
         atoms[z] = {}
-        (0..3).each do |y|
+        (-3..3).each do |y|
           atoms[z][y] = {}
-          (0..3).each do |x|
+          (-3..3).each do |x|
             atoms[z][y][x] = Atom.new(z * 100 + y * 10 + x)
             ml[z, y, x] = atoms[z][y][x]
-            subject.coords(ml, atoms[z][y][x])
+            subject.class.coords(ml, atoms[z][y][x])
+            puts "#{z}#{y}#{x} - (#{atoms[z][y][x].z / subject.class.dz}; "\
+              "#{atoms[z][y][x].y / subject.class.dy}; "\
+              "#{atoms[z][y][x].x / subject.class.dx})"
             atoms[z][y][x].z = rounding(atoms[z][y][x].z)
             atoms[z][y][x].y = rounding(atoms[z][y][x].y)
             atoms[z][y][x].x = rounding(atoms[z][y][x].x)
@@ -148,9 +151,9 @@ describe Diamond do
           end
         end
       end
-      sample_atom.z = rounding(subject.send(:dz) * 3.0)
-      sample_atom.y = rounding(subject.send(:dy) * 4.0)
-      sample_atom.x = rounding(subject.send(:dx) * 3.5)
+      sample_atom.z = rounding(subject.class.dz * 3.0)
+      sample_atom.y = rounding(subject.class.dy * 4.0)
+      sample_atom.x = rounding(subject.class.dx * 3.5)
     end
 
     it { expect(atoms[3][3][3]).to eq(sample_atom) }

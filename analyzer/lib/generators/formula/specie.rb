@@ -106,6 +106,8 @@ module VersatileDiamond
         # @param [Atom, Integer] considarating atom and iteration limit
         # @return [Boolean] either was spreading successful or not
         def spread(atom, iter)
+          # Debugging info
+
           return false if iter == 0
           result = true
           # enumerate all bonds of current atom
@@ -149,7 +151,14 @@ module VersatileDiamond
             end
             result = false if loop_success == false
           end
-          VersatileDiamond::Lattices::Base::Diamond::coords(@matlay, atom) if result == true
+          if result == true
+            if atom.atom.lattice != nil
+              atom.atom.lattice.instance.class.coords(@matlay, atom)
+            else
+              # Cybertrash!!!
+              atom.set_coords(0.0, 0.0, 0.0)
+            end
+          end
           result
         end
 
@@ -170,6 +179,11 @@ module VersatileDiamond
             @atoms.each do |atom, atom_wide|
               xml.atom('id' => atom_wide.id, 'element' => atom_wide.name) do
                 # A very armored concrete. Holy inquisition is on the way.
+                if atom.lattice != nil
+                  puts "(#{atom_wide.z / atom.lattice.instance.class.dz}; "\
+                    "#{atom_wide.y / atom.lattice.instance.class.dy}; "\
+                    "#{atom_wide.x / atom.lattice.instance.class.dx})"
+                end
                 xml.position('x' => atom_wide.x * 10e11 + 200, 'y' => atom_wide.y * 10e11 + shift_y)
               end
             end

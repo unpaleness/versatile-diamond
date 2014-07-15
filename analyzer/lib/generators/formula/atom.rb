@@ -28,6 +28,9 @@ module VersatileDiamond
           @atom.name
         end
 
+        # Compares current atom with another one
+        # @param [Atom] atom to compare
+        # @return [Boolean] result of comparison
         def ==(other_atom)
           return false if other_atom == nil
           return false if @id != other_atom.id
@@ -35,6 +38,14 @@ module VersatileDiamond
           return false if @y != other_atom.y
           return false if @x != other_atom.x
           true
+        end
+
+        # Sets all coordinates in the same time
+        # @param [Float, Float, Float] z, y, x coorinates respectively
+        def set_coords(z, y, x)
+          @z = z
+          @y = y
+          @x = x
         end
 
         # Lets us to receive information about atom in more readable format
