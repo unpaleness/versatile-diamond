@@ -32,11 +32,19 @@ module VersatileDiamond
       # @return [Boolean] is or not identical
       def ==(node)
         return false if node.class == nil.class
+        return false if self.same_place(node) == false
+        return false if @is_visited != node.is_visited
+        return false if @atom != node.atom
+        true
+      end
+
+      # Checks wheather current node is on the same place as node is
+      # @param [Node]
+      # @return [Boolean]
+      def same_place?(node)
         return false if @z != node.z
         return false if @y != node.y
         return false if @x != node.x
-        return false if @is_visited != node.is_visited
-        return false if @atom != node.atom
         true
       end
 

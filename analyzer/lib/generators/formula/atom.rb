@@ -57,20 +57,6 @@ module VersatileDiamond
           end
           res
         end
-
-        # Rotate relative to the point (z; y; x)
-        # @param [Float, Float, Float, Float, Float] z, y, x, angles of rotation
-        # @return [Float, Float, Float]
-        def rotate(z, y, x, dphi, detha)
-          @z -= z
-          @y -= y
-          @x -= x
-          move_on_sph(0, dphi, detha)
-          @z += z
-          @y += y
-          @x += x
-          [@z, @y, @x]
-        end
       end
 
     end

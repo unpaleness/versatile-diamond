@@ -67,6 +67,23 @@ module VersatileDiamond
         end
       end
 
+      # Checks if all elements are unique
+      # @return [Boolean]
+      def is_unique?
+        result = true
+        self.each do |node_outter|
+          self.each do |node_inner|
+            # puts node_inner.same_place?(node_outter)
+            if node_inner.same_place?(node_outter) == false &&
+              node_inner.atom == node_outter.atom &&
+              node_inner.atom != nil
+              result = false
+            end
+          end
+        end
+        result
+      end
+
       # /*************************************************\
       # | METHODS FOR EXTENDING OUR PIECE OF SH.. lATTICE |
       # \*************************************************/

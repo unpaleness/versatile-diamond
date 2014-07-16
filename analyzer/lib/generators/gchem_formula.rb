@@ -5,8 +5,8 @@ module VersatileDiamond
     # GChemPaint
     class GChemFormula < BaseDaughter
 
-      SPACE_Y = 400
-      SPACE_X = 100
+      SPACE_Y = 200
+      SPACE_X = 200
 
       # @override
       def initialize(analysis_result, out_path)
@@ -22,6 +22,7 @@ module VersatileDiamond
         # initializing indexes of species and atoms
         @species = []
         specie_index = 0
+        y_position = SPACE_Y
         # creating XML-stream
         xml_stream = Nokogiri::XML::Builder.new do |xml|
           # main tag
@@ -29,11 +30,12 @@ module VersatileDiamond
             # for every specie in our model
             specific_surface_specs.each do |dep_spec|
               # 'if' condition should be removed
-              if specie_index == 1
+              # if specie_index == 1
                 # adding specie
                 @species[specie_index] = Formula::Specie.new(dep_spec.spec)
-                @species[specie_index].draw(xml, specie_index, SPACE_Y * specie_index)
-              end
+                @species[specie_index].draw(xml, specie_index, SPACE_X, y_position)
+                y_position += SPACE_Y + @species[specie_index].y_size
+              # end
               # incrementing specie index
               specie_index += 1
             end

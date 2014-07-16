@@ -5,7 +5,7 @@ module VersatileDiamond
       # Creates class 'Specie' for formula
       class Specie
 
-        include Stereo
+        # include Stereo
         include VersatileDiamond::Lattice
 
         attr_reader :spec, :atoms_amount, :bonds_amount, :atoms, :bonds, :lattice
@@ -19,9 +19,17 @@ module VersatileDiamond
           bind_bonds_and_atoms
           @matlay = MatrixLayout.new
           @matlay[0, 0, 0].atom = @atoms.first[1]
-          spread(@atoms.first[1], 10)
-          # rotate(0.0, 0.0, 0.0, 0.0, 0.0)
+          spread('here should be something diffenent then nil', @atoms.first[1], 20)
+          centering
+          rotate(Math::PI / 6, 0.0, Math::PI / 3)
+          @z_max, @z_min, @y_max, @y_min, @x_max, @x_min = *measures
           # binding.pry
+        end
+
+        # Provides information about y measure of specie
+        # @return [Float] y-size
+        def y_size
+          @y_max - @y_min
         end
 
         # Collects all atoms to appropriate hash
@@ -102,13 +110,59 @@ module VersatileDiamond
           result
         end
 
-        # Recursively locates atoms' positions on the lattice
-        # @param [Atom, Integer] considarating atom and iteration limit
-        # @return [Boolean] either was spreading successful or not
-        def spread(atom, iter)
-          # Debugging info
+        # Locates center of the spec
+        # @return [Float, Float, Float] coordinates of spec's center
+        def center
+          z = y = x = 0.0
+          @atoms.each do |key, atom|
+            z, y, x = z + atom.z, y + atom.y, x + atom.x
+          end
+          z, y, x = z / @atoms_amount, y / @atoms_amount, x / @atoms_amount
+        end
 
+        # Moves center and other atom in the way where center should be (0; 0; 0)
+        def centering
+          dz, dy, dx = center
+          @atoms.each do |key, atom|
+            atom.z -= dz
+            atom.y -= dy
+            atom.x -= dx
+          end
+        end
+
+        # Counts 3-dimentional measures of the specie
+        # @return [Float, Float, Float] z-size, y-size, x-size
+        def measures
+          z_max = z_min = y_max = y_min = x_max = x_min = 0.0
+          @atoms.each do |key, atom|
+            z_max = atom.z if(atom.z > z_max)
+            z_min = atom.z if(atom.z < z_min)
+            y_max = atom.y if(atom.y > y_max)
+            y_min = atom.y if(atom.y < y_min)
+            x_max = atom.x if(atom.x > x_max)
+            x_min = atom.x if(atom.x < x_min)
+          end
+          [z_max, z_min, y_max, y_min, x_max, x_min]
+        end
+
+        # Rotates the spec on some degree by axises: Oz, Oy and Ox
+        # @param [Float, Float ,Float] angles psi, etha, phi
+        def rotate(psi, etha, phi)
+          @atoms.each do |key, atom|
+            atom.z, atom.y, atom.x = *Stereo::rotate(atom.z, atom.y, atom.x, psi, etha, phi)
+          end
+        end
+
+        # Recursively locates atoms' positions on the lattice
+        # @param [Atom, Atom, Integer] previous atom, considarating atom and
+        # iteration limit
+        # @return [Boolean] either was spreading successful or not
+        def spread(atom_prev, atom, iter)
+          # Debugging info
+          # puts "iteration = #{iter}", @matlay[atom]
+          # When iteration limit is reached
           return false if iter == 0
+          # Otherwise, we assume that spreading will implement correct
           result = true
           # enumerate all bonds of current atom
           atom.bonds.each do |atom_end, bond|
@@ -123,7 +177,7 @@ module VersatileDiamond
                 loop_success = true if node.atom == atom_end
                 are_free_nodes = true if node.atom == nil
               end
-              # if loop is not closed and there are som free nodes try it
+              # if loop is not closed and there are some free nodes try it
               if loop_success == false && are_free_nodes == true
                 # for every destination of bond
                 @matlay.send("#{bond.bond.dir}_#{bond.bond.face}", @matlay[atom]).each do |node|
@@ -132,7 +186,7 @@ module VersatileDiamond
                     # assumption that atom should be here
                     node.atom = atom_end
                     # checking this assumption
-                    if spread(atom_end, iter - 1)
+                    if @matlay.is_unique? && spread(atom, atom_end, iter - 1)
                       loop_success = true
                     else
                       # if assumption has not justified
@@ -162,29 +216,20 @@ module VersatileDiamond
           result
         end
 
-        # Rotates all atoms relative point (x; y; z)
-        # @param [Float, Float, Float, Float, Float] z, y, x, angles of rotation
-        def rotate(z, y, x, dphi, detha)
-          @atoms.each do |key, atom|
-            atom.rotate(z, y, x, dphi, detha)
-          end
-        end
-
-        # Draws a specie.
-        # Input:
-        #  - XML stream
-        #  - current index of specie (or 'molecule' in GChemPaint)
-        def draw(xml, specie_index, shift_y)
+        # Draws a specie
+        # @param [XML::Builder, Integer, Float, Float] xml-stream, index of specie,
+        # x alignment, y position from the very top
+        def draw(xml, specie_index, x_shift, y_position)
           xml.molecule('id' => specie_index) do
             @atoms.each do |atom, atom_wide|
               xml.atom('id' => atom_wide.id, 'element' => atom_wide.name) do
                 # A very armored concrete. Holy inquisition is on the way.
-                if atom.lattice != nil
-                  puts "(#{atom_wide.z / atom.lattice.instance.class.dz}; "\
-                    "#{atom_wide.y / atom.lattice.instance.class.dy}; "\
-                    "#{atom_wide.x / atom.lattice.instance.class.dx})"
-                end
-                xml.position('x' => atom_wide.x * 10e11 + 200, 'y' => atom_wide.y * 10e11 + shift_y)
+                # if atom.lattice != nil
+                #   puts "(#{atom_wide.z / atom.lattice.instance.class.dz}; "\
+                #     "#{atom_wide.y / atom.lattice.instance.class.dy}; "\
+                #     "#{atom_wide.x / atom.lattice.instance.class.dx})"
+                # end
+                xml.position('x' => atom_wide.x * 10e11 + x_shift, 'y' => atom_wide.y * 10e11 + y_position)
               end
             end
             (0...@bonds_amount).each do |i|
