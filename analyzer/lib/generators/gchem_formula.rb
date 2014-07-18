@@ -30,9 +30,16 @@ module VersatileDiamond
             # for every specie in our model
             specific_surface_specs.each do |dep_spec|
               # 'if' condition should be removed
-              # if specie_index == 1
+              # if specie_index == 15
                 # adding specie
                 @species[specie_index] = Formula::Specie.new(dep_spec.spec)
+                xml.text!('id' => "o#{specie_index}") do
+                  xml.position('x' => SPACE_X * 2 + @species[specie_index].x_size,
+                    'y' => y_position)
+                  xml.font('name' => "Pursia 10") do
+                    xml << dep_spec.spec.name.to_s
+                  end
+                end
                 @species[specie_index].draw(xml, specie_index, SPACE_X, y_position)
                 y_position += SPACE_Y + @species[specie_index].y_size
               # end

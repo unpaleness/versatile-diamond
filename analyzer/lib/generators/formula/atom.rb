@@ -51,9 +51,9 @@ module VersatileDiamond
         # Lets us to receive information about atom in more readable format
         # @return [String]
         def to_s
-          res = "id = #{@id}, z = #{@z}, y = #{@y}, x = #{@x}, bonds:\n"
+          res = "id = #{@id}, z = #{@z}, y = #{@y}, x = #{@x}, bonds:"
           @bonds.each do |id_atom_to, bond|
-            res << "#{bond.to_s}\n"
+            res << " #{bond.to_s};"
           end
           res
         end

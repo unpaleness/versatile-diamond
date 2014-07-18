@@ -12,7 +12,7 @@ module VersatileDiamond
         @by = [0, 0]
         @bx = [0, 0]
         # z -> y -> x -> coordinates
-        @nodes = {0 => {0 => {0 => Node.new(0, 0, 0, false, nil)}}}
+        @nodes = {0 => {0 => {0 => Node.new(0, 0, 0, nil)}}}
       end
 
       # Lets us to get a node with known atom or by coordinates
@@ -97,10 +97,11 @@ module VersatileDiamond
         (@by[0]..@by[1]).each do |y|
           @nodes[z_new][y] = {}
           (@bx[0]..@bx[1]).each do |x|
-            @nodes[z_new][y][x] = Node.new(z_new, y, x, false, nil)
+            @nodes[z_new][y][x] = Node.new(z_new, y, x, nil)
           end
         end
       end
+      private :extend_z
 
       # Extends matrix layout by y
       # @param [Integer] derection (-1 - forwardor 1 - backward)
@@ -110,10 +111,11 @@ module VersatileDiamond
         (@bz[0]..@bz[1]).each do |z|
           @nodes[z][y_new] = {}
           (@bx[0]..@bx[1]).each do |x|
-            @nodes[z][y_new][x] = Node.new(z, y_new, x, false, nil)
+            @nodes[z][y_new][x] = Node.new(z, y_new, x, nil)
           end
         end
       end
+      private :extend_y
 
       # Extends matrix layout by x
       # @param [Integer] derection (-1 - forwardor 1 - backward)
@@ -122,10 +124,11 @@ module VersatileDiamond
         x_new = @bx[(dir + 1) / 2]
         (@bz[0]..@bz[1]).each do |z|
           (@by[0]..@by[1]).each do |y|
-            @nodes[z][y][x_new] = Node.new(z, y, x_new, false, nil)
+            @nodes[z][y][x_new] = Node.new(z, y, x_new, nil)
           end
         end
       end
+      private :extend_x
 
       # /***************************************************\
       # | METHODS-ITERATORS FOR ACCESSING TO NODES BY BONDS |

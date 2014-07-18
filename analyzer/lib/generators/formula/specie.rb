@@ -8,9 +8,9 @@ module VersatileDiamond
         # include Stereo
         include VersatileDiamond::Lattice
 
-        attr_reader :spec, :atoms_amount, :bonds_amount, :atoms, :bonds, :lattice
+        attr_reader :spec, :atoms_amount, :bonds_amount, :atoms, :bonds
 
-        BOND_LENGTH = 140
+        SIZE_MULTIPLIER = 10e11
 
         def initialize(spec)
           @spec = spec
@@ -19,9 +19,9 @@ module VersatileDiamond
           bind_bonds_and_atoms
           @matlay = MatrixLayout.new
           @matlay[0, 0, 0].atom = @atoms.first[1]
-          spread('here should be something diffenent then nil', @atoms.first[1], 20)
+          spread(@atoms.first[1], 20)
           centering
-          rotate(Math::PI / 6, 0.0, Math::PI / 3)
+          rotate(Math::PI / 8, 0.0, Math::PI / 3)
           @z_max, @z_min, @y_max, @y_min, @x_max, @x_min = *measures
           # binding.pry
         end
@@ -29,7 +29,13 @@ module VersatileDiamond
         # Provides information about y measure of specie
         # @return [Float] y-size
         def y_size
-          @y_max - @y_min
+          (@y_max - @y_min) * SIZE_MULTIPLIER
+        end
+
+        # Provides information about x measure of specie
+        # @return [Float] x-size
+        def x_size
+          (@x_max - @x_min) * SIZE_MULTIPLIER
         end
 
         # Collects all atoms to appropriate hash
@@ -157,9 +163,19 @@ module VersatileDiamond
         # @param [Atom, Atom, Integer] previous atom, considarating atom and
         # iteration limit
         # @return [Boolean] either was spreading successful or not
-        def spread(atom_prev, atom, iter)
+        def spread(atom, iter)
           # Debugging info
-          # puts "iteration = #{iter}", @matlay[atom]
+          # (0...(20-iter)).each { |i| print ' ' }
+          # puts "\033[33miteration #{iter}\033[0m; #{@matlay[atom].coords}; atom_id = #{atom.id}{"
+          # atom.bonds.each do |at, bond|
+          #   (0...(21-iter)).each { |i| print ' ' }
+          #   print "#{bond.bond.face}"
+          #   bond.is_bond? ? print('--') : print('::')
+          #   puts "#{bond.bond.dir} to #{at.id}"
+          # end
+          #
+          # Telling depth to node
+          @matlay[atom].depth = iter
           # When iteration limit is reached
           return false if iter == 0
           # Otherwise, we assume that spreading will implement correct
@@ -186,7 +202,7 @@ module VersatileDiamond
                     # assumption that atom should be here
                     node.atom = atom_end
                     # checking this assumption
-                    if @matlay.is_unique? && spread(atom, atom_end, iter - 1)
+                    if @matlay.is_unique? && spread(atom_end, iter - 1)
                       loop_success = true
                     else
                       # if assumption has not justified
@@ -213,6 +229,18 @@ module VersatileDiamond
               atom.set_coords(0.0, 0.0, 0.0)
             end
           end
+          # Debugging info
+          # (0...(20-iter)).each { |i| print ' ' }
+          # print '}, '
+          # result ? print("\033[32m") : print("\033[31m")
+          # puts "result = #{result}\033[0m"
+          #
+          #in case of failure remove all nodes below this iteration
+          if !result
+            @matlay.each do |node|
+              node.atom = nil if node.depth < iter
+            end
+          end
           result
         end
 
@@ -229,7 +257,8 @@ module VersatileDiamond
                 #     "#{atom_wide.y / atom.lattice.instance.class.dy}; "\
                 #     "#{atom_wide.x / atom.lattice.instance.class.dx})"
                 # end
-                xml.position('x' => atom_wide.x * 10e11 + x_shift, 'y' => atom_wide.y * 10e11 + y_position)
+                xml.position('x' => atom_wide.x * SIZE_MULTIPLIER + x_shift,
+                  'y' => atom_wide.y * SIZE_MULTIPLIER + y_position)
               end
             end
             (0...@bonds_amount).each do |i|

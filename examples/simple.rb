@@ -211,6 +211,7 @@ events
     enthalpy 3.4
     activation 30
     forward_rate 2.4e8
+    reverse_rate 1e10
 
   reaction 'sierpinski drop'
     equation cross_bridge_on_bridges = methyl_on_bridge(cm: *, cm: u) + bridge(ct: *)
