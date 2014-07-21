@@ -11,6 +11,7 @@ module VersatileDiamond
         attr_reader :spec, :atoms_amount, :bonds_amount, :atoms, :bonds
 
         SIZE_MULTIPLIER = 10e11
+        BOND_UNDIRECTED = 1.7e-10
 
         def initialize(spec)
           @spec = spec
@@ -168,14 +169,14 @@ module VersatileDiamond
               # shows either there are some free nodes or not
               are_free_nodes = false
               # check for free nodes and if there is desired atom_end in lattice
-              @matlay.send("#{bond.bond.dir}_#{bond.bond.face}", @matlay[atom]).each do |node|
+              @matlay.public_send("#{bond.bond.dir}_#{bond.bond.face}", @matlay[atom]).each do |node|
                 loop_success = true if node.atom == atom_end
                 are_free_nodes = true if node.atom == nil
               end
               # if loop is not closed and there are some free nodes try it
               if loop_success == false && are_free_nodes == true
                 # for every destination of bond
-                @matlay.send("#{bond.bond.dir}_#{bond.bond.face}", @matlay[atom]).each do |node|
+                @matlay.public_send("#{bond.bond.dir}_#{bond.bond.face}", @matlay[atom]).each do |node|
                   # if node is free
                   unless node.atom
                     # assumption that atom should be here
@@ -200,12 +201,24 @@ module VersatileDiamond
             end
             result = false if loop_success == false
           end
-          if result == true
+          # In case of success we should count atoms' coordinates
+          if result
             if atom.atom.lattice
               atom.atom.lattice.instance.class.coords(@matlay, atom)
             else
               # Cybertrash!!!
-              atom.set_coords(0.0, 0.0, 0.0)
+              # atom.set_coords(0.0, 0.0, 0.0)
+              # if atom has a single undirected bond
+              if atom.bonds.count == 1
+
+              # otherwise
+              else
+              end
+            end
+          # Otherwise we shoule remove all nodes below this iteration
+          else
+            @matlay.each do |node|
+              node.atom = nil if node.depth < iter
             end
           end
           # Debugging info
@@ -214,12 +227,6 @@ module VersatileDiamond
           # result ? print("\033[32m") : print("\033[31m")
           # puts "result = #{result}\033[0m"
           #
-          #in case of failure remove all nodes below this iteration
-          unless result
-            @matlay.each do |node|
-              node.atom = nil if node.depth < iter
-            end
-          end
           result
         end
 
