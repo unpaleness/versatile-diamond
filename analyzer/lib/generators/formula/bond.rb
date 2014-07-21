@@ -22,16 +22,15 @@ module VersatileDiamond
 
         # Shows that our bond is really bond. Not just a relation!!!
         # @return [Boolean]
-        def is_bond?
-          return true if "#{@bond.class}" == 'VersatileDiamond::Concepts::Bond'
-          false
+        def bond?
+          @bond.class == Concepts::Bond
         end
 
         # Returns a string with detailed information about current bond
         # @return [String]
         def to_s
-          "from: #{@atom_begin.id}, to: #{@atom_end.id}, order = #{order}, "\
-            "face: #{@bond.face}, dir: #{@bond.dir}, is bond? - #{is_bond?}"
+          "from: #{@atom_begin.id}, to: #{@atom_end.id}, order = #{order}, " \
+            "face: #{@bond.face}, dir: #{@bond.dir}, is bond? - #{bond?}"
         end
       end
 

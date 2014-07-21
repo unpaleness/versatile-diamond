@@ -5,6 +5,7 @@ module VersatileDiamond
     # GChemPaint
     class GChemFormula < BaseDaughter
 
+      # alignments, spaces between species
       SPACE_Y = 200
       SPACE_X = 200
 

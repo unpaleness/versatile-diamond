@@ -14,8 +14,8 @@ module VersatileDiamond
 
         def initialize(spec)
           @spec = spec
-          @atoms_amount = collect_atoms
-          @bonds_amount = collect_bonds
+          collect_atoms
+          collect_bonds
           bind_bonds_and_atoms
           @matlay = MatrixLayout.new
           @matlay[0, 0, 0].atom = @atoms.first[1]
@@ -41,35 +41,25 @@ module VersatileDiamond
         # Collects all atoms to appropriate hash
         # @return [Integer] total amount of atoms in current specie
         def collect_atoms
-          @atoms = {}
-          atom_index = 0
-          # process every record in this hash
-          @spec.links.each do |key, pairs|
-            # adding an atom to hash with object.id as a key
-            @atoms[key] = Formula::Atom.new(key)
-            atom_index += 1
-          end
-          atom_index
+          pairs = @spec.links.keys.map { |atom| [atom, Formula::Atom.new(atom)] }
+          @atoms = Hash[pairs]
         end
 
         # Collects all bonds to appropriate array
         # @return [Inreger] total amount of bonds in current specie
         def collect_bonds
           @bonds = []
-          bond_index = 0
           # process every record in this hash
           @spec.links.each do |key, pairs|
             # adding bonds to array of bonds
-            (0...(pairs.count)).each do |i|
+            pairs.each do |a, rel|
               # create a new candidate bond if it was not created
-              if !already_created(@atoms, @bonds, pairs, bond_index, i, key)
-                @bonds[bond_index] =
-                  Formula::Bond.new(@atoms[key], @atoms[pairs[i][0]], pairs[i][1])
-                bond_index += 1
+              if !already_created(key, a)
+                @bonds << Formula::Bond.new(@atoms[key], @atoms[a], rel)
               end
             end
           end
-          bond_index
+          @bonds.size
         end
 
         # Adds references to bonds to every atom
@@ -77,7 +67,7 @@ module VersatileDiamond
           @atoms.each do |atom, atom_wide|
             @bonds.each do |bond|
               # if current atom id as equal to atom id of begin of bond
-              if atom_wide.id == bond.atom_begin.id then
+              if atom_wide.id == bond.atom_begin.id
                 atom_wide.bonds[bond.atom_end] = bond
               end
             end
@@ -88,32 +78,19 @@ module VersatileDiamond
         # in case of duplication
         # Reverse bonds are going to be removed completely!!!
         # @return [Logical] true/false value
-        def already_created(atoms, bonds, pairs, bond_index, pair_index, atom)
-          # firstly candidate bond marked as not created
-          is_created = false
-          # checking for bond to be identical to someone previous
-          # if so add +1 to its order
-          (0...bond_index).each do |j|
-            # checking implements throuth comparision of begin and end atoms of
-            # bonds
-            if @bonds[j].atom_begin == atoms[atom] &&
-              @bonds[j].atom_end == atoms[pairs[pair_index][0]]
-              @bonds[j].order += 1
-              # mark candidate bond as created
-              is_created = true
-            end
+        def already_created(from, to)
+          target = @bonds.find do |bond|
+            bond.atom_begin == @atoms[from] && bond.atom_end == @atoms[to]
           end
-          is_created
+          target && (target.order += 1)
         end
 
         # Translates info about spec into string
         # @return [String]
         def to_s
-          result = "#{@spec.name}\n"
-          @atoms.each do |id_atom, atom|
-            result << " #{atom.to_s}"
+          @atoms.reduce("#{@spec.name}\n") do |acc, (_, atom)|
+            acc << " #{atom.to_s}"
           end
-          result
         end
 
         # Locates center of the spec
@@ -123,7 +100,8 @@ module VersatileDiamond
           @atoms.each do |key, atom|
             z, y, x = z + atom.z, y + atom.y, x + atom.x
           end
-          z, y, x = z / @atoms_amount, y / @atoms_amount, x / @atoms_amount
+          amount = @atoms.size
+          [z / amount, y / amount, x / amount]
         end
 
         # Moves center and other atom in the way where center should be (0; 0; 0)
@@ -141,12 +119,12 @@ module VersatileDiamond
         def measures
           z_max = z_min = y_max = y_min = x_max = x_min = 0.0
           @atoms.each do |key, atom|
-            z_max = atom.z if(atom.z > z_max)
-            z_min = atom.z if(atom.z < z_min)
-            y_max = atom.y if(atom.y > y_max)
-            y_min = atom.y if(atom.y < y_min)
-            x_max = atom.x if(atom.x > x_max)
-            x_min = atom.x if(atom.x < x_min)
+            z_max = atom.z if atom.z > z_max
+            z_min = atom.z if atom.z < z_min
+            y_max = atom.y if atom.y > y_max
+            y_min = atom.y if atom.y < y_min
+            x_max = atom.x if atom.x > x_max
+            x_min = atom.x if atom.x < x_min
           end
           [z_max, z_min, y_max, y_min, x_max, x_min]
         end
@@ -155,7 +133,8 @@ module VersatileDiamond
         # @param [Float, Float ,Float] angles psi, etha, phi
         def rotate(psi, etha, phi)
           @atoms.each do |key, atom|
-            atom.z, atom.y, atom.x = *Stereo::rotate(atom.z, atom.y, atom.x, psi, etha, phi)
+            atom.z, atom.y, atom.x =
+              *Stereo::rotate(atom.z, atom.y, atom.x, psi, etha, phi)
           end
         end
 
@@ -170,7 +149,7 @@ module VersatileDiamond
           # atom.bonds.each do |at, bond|
           #   (0...(21-iter)).each { |i| print ' ' }
           #   print "#{bond.bond.face}"
-          #   bond.is_bond? ? print('--') : print('::')
+          #   bond.bond? ? print('--') : print('::')
           #   puts "#{bond.bond.dir} to #{at.id}"
           # end
           #
@@ -185,7 +164,7 @@ module VersatileDiamond
             # shows wheather our journey is successful
             loop_success = false
             # if destination atom belongs to lattice
-            if atom_end.atom.lattice != nil
+            if atom_end.atom.lattice
               # shows either there are some free nodes or not
               are_free_nodes = false
               # check for free nodes and if there is desired atom_end in lattice
@@ -198,11 +177,11 @@ module VersatileDiamond
                 # for every destination of bond
                 @matlay.send("#{bond.bond.dir}_#{bond.bond.face}", @matlay[atom]).each do |node|
                   # if node is free
-                  if node.atom == nil
+                  unless node.atom
                     # assumption that atom should be here
                     node.atom = atom_end
                     # checking this assumption
-                    if @matlay.is_unique? && spread(atom_end, iter - 1)
+                    if @matlay.unique? && spread(atom_end, iter - 1)
                       loop_success = true
                     else
                       # if assumption has not justified
@@ -222,7 +201,7 @@ module VersatileDiamond
             result = false if loop_success == false
           end
           if result == true
-            if atom.atom.lattice != nil
+            if atom.atom.lattice
               atom.atom.lattice.instance.class.coords(@matlay, atom)
             else
               # Cybertrash!!!
@@ -236,7 +215,7 @@ module VersatileDiamond
           # puts "result = #{result}\033[0m"
           #
           #in case of failure remove all nodes below this iteration
-          if !result
+          unless result
             @matlay.each do |node|
               node.atom = nil if node.depth < iter
             end
@@ -250,7 +229,7 @@ module VersatileDiamond
         def draw(xml, specie_index, x_shift, y_position)
           xml.molecule('id' => specie_index) do
             @atoms.each do |atom, atom_wide|
-              xml.atom('id' => atom_wide.id, 'element' => atom_wide.name) do
+              xml.atom('id' => atom_wide.id, 'element' => atom.name) do
                 # A very armored concrete. Holy inquisition is on the way.
                 # if atom.lattice != nil
                 #   puts "(#{atom_wide.z / atom.lattice.instance.class.dz}; "\
@@ -261,10 +240,11 @@ module VersatileDiamond
                   'y' => atom_wide.y * SIZE_MULTIPLIER + y_position)
               end
             end
-            (0...@bonds_amount).each do |i|
-              if @bonds[i].is_bond?
-                xml.bond('id' => "b#{i}", 'order' => @bonds[i].order,
-                  'begin' => @bonds[i].atom_begin.id, 'end' => @bonds[i].atom_end.id)
+
+            @bonds.each_with_index do |bond, i|
+              if bond.bond?
+                xml.bond('id' => "b#{i}", 'order' => bond.order,
+                  'begin' => bond.atom_begin.id, 'end' => bond.atom_end.id)
               end
             end
           end

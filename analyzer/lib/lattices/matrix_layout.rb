@@ -69,7 +69,7 @@ module VersatileDiamond
 
       # Checks if all elements are unique
       # @return [Boolean]
-      def is_unique?
+      def unique?
         result = true
         self.each do |node_outter|
           self.each do |node_inner|

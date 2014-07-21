@@ -52,10 +52,7 @@ module VersatileDiamond
         # @return [String]
         def to_s
           res = "id = #{@id}, z = #{@z}, y = #{@y}, x = #{@x}, bonds:"
-          @bonds.each do |id_atom_to, bond|
-            res << " #{bond.to_s};"
-          end
-          res
+          @bonds.reduce(res) { |acc, (_, bond)| acc << " #{bond.to_s};" }
         end
       end
 
