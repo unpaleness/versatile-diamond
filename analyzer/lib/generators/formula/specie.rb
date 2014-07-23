@@ -8,10 +8,7 @@ module VersatileDiamond
         # include Stereo
         include VersatileDiamond::Lattice
 
-        attr_reader :spec, :atoms_amount, :bonds_amount, :atoms, :bonds
-
-        SIZE_MULTIPLIER = 10e11
-        BOND_UNDIRECTED = 1.7e-10
+        attr_reader :spec, :atoms_amount, :bonds_amount, :atoms, :bonds, :geom
 
         def initialize(spec)
           @spec = spec
@@ -21,22 +18,8 @@ module VersatileDiamond
           @matlay = MatrixLayout.new
           @matlay[0, 0, 0].atom = @atoms.first[1]
           spread(@atoms.first[1], 20)
-          centering
-          rotate(Math::PI / 8, 0.0, Math::PI / 3)
-          @z_max, @z_min, @y_max, @y_min, @x_max, @x_min = *measures
+          @geom = SpecieStereo.new(self)
           # binding.pry
-        end
-
-        # Provides information about y measure of specie
-        # @return [Float] y-size
-        def y_size
-          (@y_max - @y_min) * SIZE_MULTIPLIER
-        end
-
-        # Provides information about x measure of specie
-        # @return [Float] x-size
-        def x_size
-          (@x_max - @x_min) * SIZE_MULTIPLIER
         end
 
         # Collects all atoms to appropriate hash
@@ -91,51 +74,6 @@ module VersatileDiamond
         def to_s
           @atoms.reduce("#{@spec.name}\n") do |acc, (_, atom)|
             acc << " #{atom.to_s}"
-          end
-        end
-
-        # Locates center of the spec
-        # @return [Float, Float, Float] coordinates of spec's center
-        def center
-          z = y = x = 0.0
-          @atoms.each do |key, atom|
-            z, y, x = z + atom.z, y + atom.y, x + atom.x
-          end
-          amount = @atoms.size
-          [z / amount, y / amount, x / amount]
-        end
-
-        # Moves center and other atom in the way where center should be (0; 0; 0)
-        def centering
-          dz, dy, dx = center
-          @atoms.each do |key, atom|
-            atom.z -= dz
-            atom.y -= dy
-            atom.x -= dx
-          end
-        end
-
-        # Counts 3-dimentional measures of the specie
-        # @return [Float, Float, Float] z-size, y-size, x-size
-        def measures
-          z_max = z_min = y_max = y_min = x_max = x_min = 0.0
-          @atoms.each do |key, atom|
-            z_max = atom.z if atom.z > z_max
-            z_min = atom.z if atom.z < z_min
-            y_max = atom.y if atom.y > y_max
-            y_min = atom.y if atom.y < y_min
-            x_max = atom.x if atom.x > x_max
-            x_min = atom.x if atom.x < x_min
-          end
-          [z_max, z_min, y_max, y_min, x_max, x_min]
-        end
-
-        # Rotates the spec on some degree by axises: Oz, Oy and Ox
-        # @param [Float, Float ,Float] angles psi, etha, phi
-        def rotate(psi, etha, phi)
-          @atoms.each do |key, atom|
-            atom.z, atom.y, atom.x =
-              *Stereo::rotate(atom.z, atom.y, atom.x, psi, etha, phi)
           end
         end
 
@@ -243,8 +181,8 @@ module VersatileDiamond
                 #     "#{atom_wide.y / atom.lattice.instance.class.dy}; "\
                 #     "#{atom_wide.x / atom.lattice.instance.class.dx})"
                 # end
-                xml.position('x' => atom_wide.x * SIZE_MULTIPLIER + x_shift,
-                  'y' => atom_wide.y * SIZE_MULTIPLIER + y_position)
+                xml.position('x' => SpecieStereo::to_p(atom_wide.x) + x_shift,
+                  'y' => SpecieStereo::to_p(atom_wide.y) + y_position)
               end
             end
 
