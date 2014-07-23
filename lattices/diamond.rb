@@ -127,9 +127,9 @@ public
   # Lets us to count coordinates of atom on MatrixLayout
   def self.coords(matrix_layout, atom)
     node = matrix_layout[atom]
-    node.atom.z = node.z * dz
-    node.atom.y = dy * (node.y + 0.5 * ((node.z + 1) / 2))
-    node.atom.x = dx * (node.x + 0.5 * (node.z / 2))
+    node.atom.p[0] = node.z * dz
+    node.atom.p[1] = dy * (node.y + 0.5 * ((node.z + 1) / 2))
+    node.atom.p[2] = dx * (node.x + 0.5 * (node.z / 2))
   end
 
 end

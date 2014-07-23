@@ -5,16 +5,14 @@ module VersatileDiamond
       # Creates class 'Atom' for Formula. Contains !relative! coordinates in volume
       class Atom
 
-        include Stereo
-
         attr_reader :atom, :id
-        attr_accessor :x, :y, :z, :id, :bonds, :node
+        attr_accessor :p, :id, :bonds, :node
 
         # Initializer
         # 'atom' is a reference to atoms defined for current spec by Gleb
         # firstly all coordinates are 0
         def initialize(atom)
-          @x = @y = @z = 0
+          @p = [0, 0, 0]
           @atom = atom
           @id = @atom.object_id
           @bonds = {}
@@ -34,24 +32,58 @@ module VersatileDiamond
         def ==(other_atom)
           return false if other_atom == nil
           return false if @id != other_atom.id
-          return false if @z != other_atom.z
-          return false if @y != other_atom.y
-          return false if @x != other_atom.x
+          @p.each_with_index do |coord, i|
+            return false if coord != other_atom.p[i]
+          end
           true
         end
 
-        # Sets all coordinates in the same time
-        # @param [Float, Float, Float] z, y, x coorinates respectively
-        def set_coords(z, y, x)
-          @z = z
-          @y = y
-          @x = x
+        # @overload set_coords(coords)
+        #  Coordinates in array view
+        #  @param [Array] array of Float z, y, x coordinates
+        # @overload set_coords(z, y, x)
+        #  Coordinates in pile view
+        #  @param [Float, Float, Float] z, y, x coorinates respectively
+        def set_coords(*coords)
+          # if array view
+          if coords.size == 1
+            coords[0].each_with_index do |coord, i|
+              @p[i] = coord
+            end
+          elsif coords.size == 3
+            coords.each_with_index do |coord, i|
+              @p[i] = coord
+            end
+          else
+            raise ArgumentExeption, 'Wrong number of arguments (not 1 and not 3)'
+          end
+        end
+
+        # @overload inc_coords(coords)
+        #  Increment of coordinates in array view
+        #  @param [Array] array of Float dz, dy, dx increments
+        # @overload inc_coords(z, y, x)
+        #  Increment of coordinates in pile view
+        #  @param [Float, Float, Float] dz, dy, dx increments respectively
+        def inc_coords(*coords)
+          # if array view
+          if coords.size == 1
+            coords[0].each_with_index do |coord, i|
+              @p[i] += coord
+            end
+          elsif coords.size == 3
+            coords.each_with_index do |coord, i|
+              @p[i] += coord
+            end
+          else
+            raise ArgumentExeption, 'Wrong number of arguments (not 1 and not 3)'
+          end
         end
 
         # Lets us to receive information about atom in more readable format
         # @return [String]
         def to_s
-          res = "id = #{@id}, z = #{@z}, y = #{@y}, x = #{@x}, bonds:"
+          res = "id = #{@id}, z = #{@p[0]}, y = #{@p[1]}, x = #{@p[2]}, bonds:"
           @bonds.reduce(res) { |acc, (_, bond)| acc << " #{bond.to_s};" }
         end
       end

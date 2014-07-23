@@ -141,19 +141,19 @@ describe Diamond do
             atoms[z][y][x] = Atom.new(z * 100 + y * 10 + x)
             ml[z, y, x] = atoms[z][y][x]
             subject.class.coords(ml, atoms[z][y][x])
-            puts "#{z}#{y}#{x} - (#{atoms[z][y][x].z / subject.class.dz}; "\
-              "#{atoms[z][y][x].y / subject.class.dy}; "\
-              "#{atoms[z][y][x].x / subject.class.dx})"
-            atoms[z][y][x].z = rounding(atoms[z][y][x].z)
-            atoms[z][y][x].y = rounding(atoms[z][y][x].y)
-            atoms[z][y][x].x = rounding(atoms[z][y][x].x)
+            puts "#{z}#{y}#{x} - (#{atoms[z][y][x].p[0] / subject.class.dz}; "\
+              "#{atoms[z][y][x].p[1] / subject.class.dy}; "\
+              "#{atoms[z][y][x].p[2] / subject.class.dx})"
+            atoms[z][y][x].p[0] = rounding(atoms[z][y][x].p[0])
+            atoms[z][y][x].p[1] = rounding(atoms[z][y][x].p[1])
+            atoms[z][y][x].p[2] = rounding(atoms[z][y][x].p[2])
             # puts ml[z, y, x]
           end
         end
       end
-      sample_atom.z = rounding(subject.class.dz * 3.0)
-      sample_atom.y = rounding(subject.class.dy * 4.0)
-      sample_atom.x = rounding(subject.class.dx * 3.5)
+      sample_atom.p[0] = rounding(subject.class.dz * 3.0)
+      sample_atom.p[1] = rounding(subject.class.dy * 4.0)
+      sample_atom.p[2] = rounding(subject.class.dx * 3.5)
     end
 
     it { expect(atoms[3][3][3]).to eq(sample_atom) }

@@ -10,6 +10,8 @@ module VersatileDiamond
 
         attr_reader :spec, :atoms_amount, :bonds_amount, :atoms, :bonds, :geom
 
+        # Initializer o_O
+        # @param [Specie] uses specie defined by Gleb
         def initialize(spec)
           @spec = spec
           collect_atoms
@@ -19,6 +21,7 @@ module VersatileDiamond
           @matlay[0, 0, 0].atom = @atoms.first[1]
           spread(@atoms.first[1], 20)
           @geom = SpecieStereo.new(self)
+          @geom.count_undirected_atoms_coordinates
           # binding.pry
         end
 
@@ -48,19 +51,19 @@ module VersatileDiamond
 
         # Adds references to bonds to every atom
         def bind_bonds_and_atoms
-          @atoms.each do |atom, atom_wide|
+          @atoms.each do |_, atom|
             @bonds.each do |bond|
               # if current atom id as equal to atom id of begin of bond
-              if atom_wide.id == bond.atom_begin.id
-                atom_wide.bonds[bond.atom_end] = bond
+              if atom.id == bond.atom_begin.id
+                atom.bonds[bond.atom_end] = bond
               end
             end
           end
         end
 
         # Checks wheather bond was created or not and adds 'order' parameter to bond
-        # in case of duplication
-        # Reverse bonds are going to be removed completely!!!
+        # @param [Atom] begin atom
+        # @param [Atom] end atom
         # @return [Logical] true/false value
         def already_created(from, to)
           target = @bonds.find do |bond|
@@ -181,8 +184,8 @@ module VersatileDiamond
                 #     "#{atom_wide.y / atom.lattice.instance.class.dy}; "\
                 #     "#{atom_wide.x / atom.lattice.instance.class.dx})"
                 # end
-                xml.position('x' => SpecieStereo::to_p(atom_wide.x) + x_shift,
-                  'y' => SpecieStereo::to_p(atom_wide.y) + y_position)
+                xml.position('x' => SpecieStereo::to_p(atom_wide.p[2]) + x_shift,
+                  'y' => SpecieStereo::to_p(atom_wide.p[1]) + y_position)
               end
             end
 
