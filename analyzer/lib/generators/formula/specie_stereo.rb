@@ -81,32 +81,65 @@ module VersatileDiamond
           end
         end
 
+        # Counts coordinates of the third point with known first and second and
+        # distance from second to third
+        # @param [Array] z, y, x coordinates of first point
+        # @param [Array] z, y, x coordinates of second point
+        # @param [Float] distance from second to third point
+        def third_point(first, second, length23)
+          dcoord = [nil, nil, nil]
+          dcoord.each_with_index do |_, index|
+            dcoord[index] = second[index] - first[index]
+          end
+          length12 = dcoord.inject(0.0) do |acc, dif|
+            acc + dif * dif
+          end
+          length12 = length12 ** (1.0 / 2)
+          length13 = length12 + length23
+          sim_coef = length13 / length12
+          [first[0] + dcoord[0] * sim_coef, first[1] + dcoord[1] * sim_coef,
+            first[2] + dcoord[2] * sim_coef]
+        end
+
         # Lets us count atom's coordinates with known one or two neighbours of atom
         # connected with current
         # @overload count_atom_by_one_or_two_atoms(A)
-        #  @param [Atom] a single atom
+        #  @param [Atom] a single neighbour of parent
+        #  @param [Atom] parent atom
         # @overload count_atom_by_one_or_two_atoms(A, B)
-        #  @param [Atom] first atom
-        #  @param [Atom] second atom
+        #  @param [Atom] first neighbour of parent
+        #  @param [Atom] second neighbour of parent
+        #  @param [Atom] parent atom
         # @return [Float, Float, Float] coordinates of current atom
-        def count_atom_by_one_or_two_atoms(atoms)
-          if atoms.size == 1
-          elsif atoms.size == 2
+        def count_atom_by_one_or_two_atoms(atom_parent_neighbours, atom_parent)
+          # neighbours_center ----- parent ----- sought-for atom
+          neighbours_center = [nil, nil, nil]
+          result = [nil, nil, nil]
+          # finding center of neighbours
+          if atom_parent_neighbours.size == 1
+            neighbours_center = atom_parent_neighbours[0].p
+          elsif atom_parent_neighbours.size == 2
+            neighbours_center.each_with_index do |coord, index|
+              coord = (atom_parent_neighbours[0].p[index] +
+                atom_parent_neighbours[1].p[index]) / 2
+            end
           else
-            raise ArgumentExeption, 'Wrong number of atoms (must be 1 or 2)'
+            raise ArgumentExeption, 'Wrong number of neighbours (must be 1 or 2)'
           end
-
+          #
+          puts 'line'
+          third_point(neighbours_center, atom_parent.p, BOND_UNDIRECTED)
         end
 
         # Leads triangle of atoms to plane XOY, one vertex must be on O(0; 0; 0), one
         # edge must lie on OX
         # @param [Array]
-        # 0 - first atom, it should be led to O(0; 0; 0),
-        # 1 - second atom, should be led to somewhere on xOy,
-        # 2 - third atom, should be led to Ox
-        # @return [Float, Float, Float, Float, Float, Float] z, y, x - coordinates of
-        # A before moving; phi, etha, psi - angles by which triangle was rotated
-        def count_atom_by_triangle(atoms)
+        # 0 - first neighbour of parent, it should be led to O(0; 0; 0),
+        # 1 - second neighbour of parent, should be led to somewhere on xOy,
+        # 2 - third neighbour of parent, should be led to Ox
+        # @param [Atom] parent atom
+        # @return [Float, Float, Float] z, y, x - coordinates of sought for atom
+        def count_atom_by_triangle(atoms, at)
           # recording old values of coordinates of atom A
           z, y, x = Atoms[0].p
           z, y, x = -z, -y, -x
@@ -115,35 +148,40 @@ module VersatileDiamond
             atom.inc_coords(z, y, x)
           end
           # counting angle phi to rotate around Oz
-
+          puts 'triangle'
+          [0, 0, 0]
         end
 
         # Counts coordinates of atom with undirected bonds
         # @param [Atom] atom
         def undirected_atom_coordinates(atom)
-          atoms = []
           # if atom has one undirected bond
+          puts @specie.spec.name
           if atom.bonds.count == 1
-            atom.bonds.each do |at, bond|
+            atom_parent = atom.bonds.first[0]
+            atom_parent_neighbours = []
+            # recording all crystalic neighbours of parent to array
+            atom_parent.bonds.each do |at, bond|
               unless bond.bond.face || bond.bond.dir
-                atoms << at
+                atom_parent_neighbours << at
               end
             end
             # if bonded atom has one or two other bonds (current + others)
-            if atom.bonds.count < 4
-              atom.set_coords = count_atom_by_one_or_two_atoms(atoms)
+            if atom_parent_neighbours.count < 3
+              atom.set_coords(
+                count_atom_by_one_or_two_atoms(atom_parent_neighbours, atom_parent))
             # if we have three or more bonds take first three and then make
             # caclulations
             else
-              atom.set_coords = count_atom_by_triangle(atoms[0..2])
+              atom.set_coords(
+                count_atom_by_triangle(atom_parent_neighbours[0..2], atom_parent))
             end
           # if atom has 2 undirected bonds
-          elsif atom.bonds.count == 2
+          elsif atom_parent_neighbours.count == 2
           # if atom has more then 2 undirected bonds
           else
           end
             #
-          end
         end
 
         # Counts coordinates of all undirected atoms
