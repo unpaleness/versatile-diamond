@@ -14,6 +14,7 @@ module VersatileDiamond
         # @param [Specie] uses specie defined by Gleb
         def initialize(spec)
           @spec = spec
+          binding.pry
           collect_atoms
           collect_bonds
           bind_bonds_and_atoms
@@ -28,7 +29,9 @@ module VersatileDiamond
         # Collects all atoms to appropriate hash
         # @return [Integer] total amount of atoms in current specie
         def collect_atoms
-          pairs = @spec.links.keys.map { |atom| [atom, Formula::Atom.new(atom)] }
+          pairs = {}
+          @spec.links
+          # pairs = @spec.links.keys.map { |atom| [atom, Formula::Atom.new(atom)] }
           @atoms = Hash[pairs]
         end
 

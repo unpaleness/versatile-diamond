@@ -33,13 +33,13 @@ module VersatileDiamond
               # 'if' condition should be removed
               # if specie_index == 15
                 # adding specie
-                @species[specie_index] = Formula::Specie.new(dep_spec.spec)
+                @species[specie_index] = Formula::Specie.new(dep_spec)
                 xml.text!('id' => "o#{specie_index}") do
                   xml.position('x' => SPACE_X * 2 +
                     SpecieStereo::to_p(@species[specie_index].geom.x_size),
                     'y' => y_position)
                   xml.font('name' => "Pursia 10") do
-                    xml << dep_spec.spec.name.to_s
+                    xml << dep_spec.name.to_s
                   end
                 end
                 @species[specie_index].draw(xml, specie_index, SPACE_X, y_position)
