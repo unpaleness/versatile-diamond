@@ -26,6 +26,12 @@ module VersatileDiamond
           @bond.class == Concepts::Bond
         end
 
+        # Average value of z coordinate of both atoms
+        # @return [Float] average z of atom_begin and atom_end
+        def avg_z
+          (@atom_begin.p[0] + @atom_end.p[0]) / 2
+        end
+
         # Returns a string with detailed information about current bond
         # @return [String]
         def to_s

@@ -83,7 +83,7 @@ module VersatileDiamond
         # Lets us to receive information about atom in more readable format
         # @return [String]
         def to_s
-          res = "id = #{@id}, z = #{@p[0]}, y = #{@p[1]}, x = #{@p[2]}, bonds:"
+          res = "#{bonds.size}\nid = #{@id}, z = #{@p[0]}, y = #{@p[1]}, x = #{@p[2]}, bonds:"
           @bonds.reduce(res) { |acc, (_, bond)| acc << " #{bond.to_s};" }
         end
       end

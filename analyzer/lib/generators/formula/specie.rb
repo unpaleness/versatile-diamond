@@ -8,19 +8,29 @@ module VersatileDiamond
         # include Stereo
         include VersatileDiamond::Lattice
 
+        ITER_LIMIT = 20
+
         attr_reader :spec, :atoms_amount, :bonds_amount, :atoms, :bonds, :geom
+
+        # Returns atom to start spreading
+        # @return [Atom]
+        def spread_start_atom
+          @atoms.values.max_by { |atom| atom.bonds.size }
+        end
+        private :spread_start_atom
 
         # Initializer o_O
         # @param [Specie] uses specie defined by Gleb
         def initialize(spec)
           @spec = spec
-          binding.pry
           collect_atoms
           collect_bonds
           bind_bonds_and_atoms
           @matlay = MatrixLayout.new
-          @matlay[0, 0, 0].atom = @atoms.first[1]
-          spread(@atoms.first[1], 20)
+          # puts @spec.name
+          # binding.pry
+          @matlay[0, 0, 0].atom = spread_start_atom
+          spread(spread_start_atom, ITER_LIMIT)
           @geom = SpecieStereo.new(self)
           @geom.count_undirected_atoms_coordinates
           # binding.pry
@@ -30,8 +40,11 @@ module VersatileDiamond
         # @return [Integer] total amount of atoms in current specie
         def collect_atoms
           pairs = {}
-          @spec.links
-          # pairs = @spec.links.keys.map { |atom| [atom, Formula::Atom.new(atom)] }
+          @spec.links.each do |_, bonds|
+            bonds.each do |atom, _|
+              pairs[atom] = Formula::Atom.new(atom)
+            end
+          end
           @atoms = Hash[pairs]
         end
 
@@ -44,12 +57,12 @@ module VersatileDiamond
             # adding bonds to array of bonds
             pairs.each do |a, rel|
               # create a new candidate bond if it was not created
-              if !already_created(key, a)
+              # puts "is #{rel} a simbol? - #{rel.is_a?(Symbol)}"
+              if !already_created(key, a) && !rel.is_a?(Symbol)
                 @bonds << Formula::Bond.new(@atoms[key], @atoms[a], rel)
               end
             end
           end
-          @bonds.size
         end
 
         # Adds references to bonds to every atom
@@ -149,15 +162,6 @@ module VersatileDiamond
           if result
             if atom.atom.lattice
               atom.atom.lattice.instance.class.coords(@matlay, atom)
-            else
-              # Cybertrash!!!
-              # atom.set_coords(0.0, 0.0, 0.0)
-              # if atom has a single undirected bond
-              if atom.bonds.count == 1
-
-              # otherwise
-              else
-              end
             end
           # Otherwise we shoule remove all nodes below this iteration
           else
@@ -191,8 +195,8 @@ module VersatileDiamond
                   'y' => SpecieStereo::to_p(atom_wide.p[1]) + y_position)
               end
             end
-
-            @bonds.each_with_index do |bond, i|
+            lambda_comp_avg_z = -> a, b { a.avg_z <=> b.avg_z }
+            @bonds.sort(&lambda_comp_avg_z).each_with_index do |bond, i|
               if bond.bond?
                 xml.bond('id' => "b#{i}", 'order' => bond.order,
                   'begin' => bond.atom_begin.id, 'end' => bond.atom_end.id)

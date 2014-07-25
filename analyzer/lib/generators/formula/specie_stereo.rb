@@ -18,7 +18,7 @@ module VersatileDiamond
         def initialize(specie)
           @specie = specie
           centering
-          rotate(Math::PI / 8, 0.0, Math::PI / 3)
+          rotate(-Math::PI * 3 / 8, 0.0, Math::PI * 4 / 10)
           @z_max, @z_min, @y_max, @y_min, @x_max, @x_min = *measures
         end
 
@@ -133,23 +133,29 @@ module VersatileDiamond
 
         # Leads triangle of atoms to plane XOY, one vertex must be on O(0; 0; 0), one
         # edge must lie on OX
-        # @param [Array]
-        # 0 - first neighbour of parent, it should be led to O(0; 0; 0),
-        # 1 - second neighbour of parent, should be led to somewhere on xOy,
-        # 2 - third neighbour of parent, should be led to Ox
+        # @param [Atom] first neighbour of parent, it should be led to O(0; 0; 0),
+        # @param [Atom] second neighbour of parent, should be led to somewhere on xOy,
+        # @param [Atom] third neighbour of parent, should be led to Ox
         # @param [Atom] parent atom
         # @return [Float, Float, Float] z, y, x - coordinates of sought for atom
-        def count_atom_by_triangle(atoms, at)
+        def count_atom_by_triangle(atomA, atomB, atomC, parent)
           # recording old values of coordinates of atom A
-          z, y, x = atoms[0].p
+          z, y, x = atomA.p
           z, y, x = -z, -y, -x
+          result_atom = Formula::Atom.new(nil)
+          atoms = [atomA, atomB, atomC, parent, result_atom]
           # moving all coordinates by the values of A-coordinates
+          atoms.each do |atom|
+            atom.inc_coords(z, y, x)
+          end
+          # moving backwards
+          z, y, x = -z, -y, -x
           atoms.each do |atom|
             atom.inc_coords(z, y, x)
           end
           # counting angle phi to rotate around Oz
           puts atoms.size
-          [0, 0, 0]
+          result_atom.p
         end
 
         # Counts coordinates of atom with undirected bonds
@@ -162,7 +168,7 @@ module VersatileDiamond
             atom_parent_neighbours = []
             # recording all crystalic neighbours of parent to array
             atom_parent.bonds.each do |at, bond|
-              if bond.bond.face && bond.bond.dir && bond.bond?
+              if bond.bond? && bond.bond.face && bond.bond.dir
                 atom_parent_neighbours << at
               end
             end
@@ -174,10 +180,10 @@ module VersatileDiamond
             # caclulations
             else
               atom.set_coords(
-                count_atom_by_triangle(atom_parent_neighbours[0..2], atom_parent))
+                count_atom_by_triangle(*atom_parent_neighbours[0..2], atom_parent))
             end
           # if atom has 2 undirected bonds
-          elsif atom_parent_neighbours.count == 2
+          elsif atom.bonds.count == 2
           # if atom has more then 2 undirected bonds
           else
           end
@@ -189,7 +195,7 @@ module VersatileDiamond
           @specie.atoms.each do |_, atom|
             undirected = true
             atom.bonds.each do |_, bond|
-              if bond.bond.face && bond.bond.dir
+              if bond.bond? && bond.bond.face && bond.bond.dir
                 undirected = false
               end
             end
