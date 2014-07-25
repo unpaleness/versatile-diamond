@@ -120,14 +120,14 @@ module VersatileDiamond
             neighbours_center = atom_parent_neighbours[0].p
           elsif atom_parent_neighbours.size == 2
             neighbours_center.each_with_index do |coord, index|
-              coord = (atom_parent_neighbours[0].p[index] +
+              neighbours_center[index] = (atom_parent_neighbours[0].p[index] +
                 atom_parent_neighbours[1].p[index]) / 2
             end
           else
             raise ArgumentExeption, 'Wrong number of neighbours (must be 1 or 2)'
           end
           #
-          puts 'line'
+          puts atom_parent_neighbours.size
           third_point(neighbours_center, atom_parent.p, BOND_UNDIRECTED)
         end
 
@@ -141,14 +141,14 @@ module VersatileDiamond
         # @return [Float, Float, Float] z, y, x - coordinates of sought for atom
         def count_atom_by_triangle(atoms, at)
           # recording old values of coordinates of atom A
-          z, y, x = Atoms[0].p
+          z, y, x = atoms[0].p
           z, y, x = -z, -y, -x
           # moving all coordinates by the values of A-coordinates
-          Atoms.each do |atom|
+          atoms.each do |atom|
             atom.inc_coords(z, y, x)
           end
           # counting angle phi to rotate around Oz
-          puts 'triangle'
+          puts atoms.size
           [0, 0, 0]
         end
 
@@ -162,7 +162,7 @@ module VersatileDiamond
             atom_parent_neighbours = []
             # recording all crystalic neighbours of parent to array
             atom_parent.bonds.each do |at, bond|
-              unless bond.bond.face || bond.bond.dir
+              if bond.bond.face && bond.bond.dir && bond.bond?
                 atom_parent_neighbours << at
               end
             end

@@ -17,9 +17,11 @@ module VersatileDiamond
             [[1.0, 1.0, 1.0], Math::PI, [1.0, -1.0, -1.0]],
             [[1.0, 1.0, 1.0], Math::PI / 2, [1.0, 1.0, -1.0]]
           ].each do |arr|
-            let(:result) { subject.rotateOz(*arr[0], arr[1]).map(&round_lambda) }
-            let(:answer) { arr[2] }
-            it { expect(result).to eq(answer) }
+            it "rotate point #{arr[0]} on angle #{arr[1]} around Oz" do
+              result = subject.rotateOz(*arr[0], arr[1]).map(&round_lambda)
+              answer = arr[2]
+              expect(result).to eq(answer)
+            end
           end
         end
 
@@ -28,9 +30,11 @@ module VersatileDiamond
             [[1.0, 1.0, 1.0], Math::PI, [-1.0, 1.0, -1.0]],
             [[1.0, 1.0, 1.0], Math::PI / 2, [-1.0, 1.0, 1.0]]
           ].each do |arr|
-            let(:result) { subject.rotateOy(*arr[0], arr[1]).map(&round_lambda) }
-            let(:answer) { arr[2] }
-            it { expect(result).to eq(answer) }
+            it "rotate point #{arr[0]} on angle #{arr[1]} around Oy" do
+              result = subject.rotateOy(*arr[0], arr[1]).map(&round_lambda)
+              answer = arr[2]
+              expect(result).to eq(answer)
+            end
           end
         end
 
@@ -39,20 +43,27 @@ module VersatileDiamond
             [[1.0, 1.0, 1.0], Math::PI, [-1.0, -1.0, 1.0]],
             [[1.0, 1.0, 1.0], Math::PI / 2, [1.0, -1.0, 1.0]]
           ].each do |arr|
-            let(:result) { subject.rotateOx(*arr[0], arr[1]).map(&round_lambda) }
-            let(:answer) { arr[2] }
-            it { expect(result).to eq(answer) }
+            it "rotate point #{arr[0]} on angle #{arr[1]} around Ox" do
+              result = subject.rotateOx(*arr[0], arr[1]).map(&round_lambda)
+              answer = arr[2]
+              expect(result).to eq(answer)
+            end
           end
         end
 
         describe '#rotate' do
           [
             [[1.0, 1.0, 1.0], [Math::PI, Math::PI, Math::PI], [1.0, 1.0, 1.0]],
-            [[1.0, 1.0, 1.0], [Math::PI / 4, Math::PI / 4, Math::PI / 4], [1.5, 0.5, 0.707107]]
+
+            [[1.0, 1.0, 1.0], [Math::PI / 4, Math::PI / 4, Math::PI / 4],
+            [1.5, 0.5, 0.707107]]
           ].each do |arr|
-            let(:result) { subject.rotate(*arr[0], *arr[1]).map(&round_lambda) }
-            let(:answer) { arr[2] }
-            it { expect(result).to eq(answer) }
+            it "rotate point #{arr[0]} on angle #{arr[1][0]} around Oz, "\
+              "on angle #{arr[1][1]} around Oy and on angle #{arr[1][2]} around Ox" do
+              result = subject.rotate(*arr[0], *arr[1]).map(&round_lambda)
+              answer = arr[2]
+              expect(result).to eq(answer)
+            end
           end
         end
 
