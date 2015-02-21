@@ -1,6 +1,5 @@
 #include <signal.h>
 #include <tools/init_config.h>
-#include "run.h"
 
 void stopSignalHandler(int)
 {
@@ -28,7 +27,7 @@ int main(int argc, char *argv[])
     {
         const InitConfig init(argc, argv);
         Runner<Handbook> runner(init);
-        run(runner);
+        runner.calculate();
     }
     catch (Error error)
     {

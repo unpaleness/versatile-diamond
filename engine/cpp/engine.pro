@@ -56,7 +56,6 @@ SOURCES += \
     ../hand-generations/src/reactions/ubiquitous/local/methyl_on_dimer_deactivation.cpp \
     ../hand-generations/src/reactions/ubiquitous/surface_activation.cpp \
     ../hand-generations/src/reactions/ubiquitous/surface_deactivation.cpp \
-    ../hand-generations/src/run.cpp \
     ../hand-generations/src/species/base/bridge.cpp \
     ../hand-generations/src/species/base/bridge_cri.cpp \
     ../hand-generations/src/species/base/bridge_with_dimer.cpp \
@@ -201,7 +200,6 @@ HEADERS += \
     ../hand-generations/src/reactions/ubiquitous/local/methyl_on_dimer_deactivation.h \
     ../hand-generations/src/reactions/ubiquitous/surface_activation.h \
     ../hand-generations/src/reactions/ubiquitous/surface_deactivation.h \
-    ../hand-generations/src/run.h \
     ../hand-generations/src/species/base.h \
     ../hand-generations/src/species/base/bridge.h \
     ../hand-generations/src/species/base/bridge_cri.h \

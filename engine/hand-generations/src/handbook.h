@@ -70,6 +70,8 @@ public:
 
     typedef Diamond SurfaceCrystal;
 
+    static const std::initializer_list<ushort> integralTypes;
+
     enum : ushort { MAX_SPEC_LENGHT = 3 };
 };
 

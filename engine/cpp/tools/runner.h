@@ -37,7 +37,7 @@ public:
     Runner(const InitConfig &init);
     ~Runner();
 
-    void calculate(const std::initializer_list<ushort> &types);
+    void calculate();
 
 private:
     Runner(const Runner &) = delete;
@@ -162,10 +162,10 @@ void Runner<HB>::outputMemoryUsage(std::ostream &os) const
 }
 
 template <class HB>
-void Runner<HB>::calculate(const std::initializer_list<ushort> &types)
+void Runner<HB>::calculate()
 {
     // TODO: Предоставить возможность сохранять концентрацию структур
-    CrystalSliceSaver csSaver(filename().c_str(), _x * _y, types);
+    CrystalSliceSaver csSaver(filename().c_str(), _x * _y, HB::integralTypes);
 
 // -------------------------------------------------------------------------------- //
 

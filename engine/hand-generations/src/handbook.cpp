@@ -175,3 +175,8 @@ ushort Handbook::specificate(ushort type)
     assert(__atomsNum > type);
     return __atomsSpecifing[type];
 }
+
+const std::initializer_list<ushort> Handbook::integralTypes =
+{
+    0, 2, 4, 5, 20, 21, 24, 28, 32
+};

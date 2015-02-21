@@ -1,8 +1,7 @@
 #ifndef MPI_RUNNER_H
 #define MPI_RUNNER_H
 
-#include "run.h"
-#include "init_config.h"
+#include "../tools/init_config.h"
 #include "mpi_config.h"
 
 /*
@@ -14,12 +13,21 @@ template <class HB>
 class MPIRunner
 {
 public:
-  MPIRunner(const InitConfig &init, const MPIConfig &mpi);
-  ~MPIRunner();
+    MPIRunner(const InitConfig &init, const MPIConfig &mpi);
+    ~MPIRunner();
 
 private:
-  Runner <Handbook> **_runners;
-
+    InitConfig _init;
+    MPIConfig _mpi;
+    Runner<Handbook> **_runners; // pointers to Runners of each fragment
 };
+
+MPIRunner::MPIRunner(const InitConfig &init, const MPIConfig &mpi)
+{
+}
+
+MPIRunner::~MPIRunner()
+{
+}
 
 #endif // MPI_RUNNER_H
