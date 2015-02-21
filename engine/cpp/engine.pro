@@ -129,7 +129,8 @@ SOURCES += \
     tools/savers/xyz_format.cpp \
     tools/savers/xyz_saver.cpp \
     tools/scavenger.cpp \
-    tools/yaml_config_reader.cpp
+    tools/yaml_config_reader.cpp \
+    mpi/mpi_config.cpp
 
 HEADERS += \
     ../hand-generations/src/atoms/atom_builder.h \
@@ -324,9 +325,12 @@ HEADERS += \
     tools/scavenger.h \
     tools/typed.h \
     tools/vector3d.h \
-    tools/yaml_config_reader.h
+    tools/yaml_config_reader.h \
+    mpi/mpi_runner.h \
+    mpi/mpi_config.h
 
 OTHER_FILES += \
     ../hand-generations/src/configs/env.yml \
     ../hand-generations/src/configs/reactions.yml \
+    ../hand-generations/src/configs/mpi.yml \
     ../hand-generations/atoms_transitive_graph.png

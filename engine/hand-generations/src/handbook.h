@@ -69,6 +69,8 @@ public:
     static ushort specificate(ushort type);
 
     typedef Diamond SurfaceCrystal;
+
+    enum : ushort { MAX_SPEC_LENGHT = 3 };
 };
 
 #endif // HANDBOOK_H

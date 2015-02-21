@@ -1,5 +1,4 @@
 #include <signal.h>
-#include <omp.h>
 #include <tools/init_config.h>
 #include "run.h"
 
