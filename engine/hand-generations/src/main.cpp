@@ -26,6 +26,13 @@ int main(int argc, char *argv[])
 
     // initialize parallel implementation
     MPI_Init(&argc, &argv);
+    int nMPIThreads;
+    MPI_Comm_size(MPI_COMM_WORLD, &nMPIThreads);
+    if(nMPIThreads < 3)
+    {
+        std::cerr << "Too few threads! Program terminates." << std::endl;
+        return 1;
+    }
 
     try
     {
