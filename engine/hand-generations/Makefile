@@ -10,7 +10,7 @@ ARKSFLAGS	:= -DNDEBUG
 STANDART	:= -std=c++11
 
 GCC_PATH	:= /usr
-CXX		:= $(GCC_PATH)/bin/g++
+CXX		:= $(GCC_PATH)/bin/mpic++
 DFLAGS		:= $(STANDART) -I$(ENGINE_SRC_DIR)
 CFLAGS		:= $(DFLAGS) -O2
 LFLAGS		:= $(STANDART) -lyaml-cpp

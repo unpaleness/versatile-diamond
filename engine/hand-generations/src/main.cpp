@@ -1,5 +1,6 @@
 #include <signal.h>
 #include <tools/init_config.h>
+#include <mpi.h>
 
 void stopSignalHandler(int)
 {
@@ -23,6 +24,9 @@ int main(int argc, char *argv[])
     signal(SIGINT, stopSignalHandler);
     signal(SIGTERM, stopSignalHandler);
 
+    // initialize parallel implementation
+    MPI_Init(&argc, &argv);
+
     try
     {
         const InitConfig init(argc, argv);
@@ -33,6 +37,9 @@ int main(int argc, char *argv[])
     {
         std::cerr << "Run error:\n  " << error.message() << std::endl;
     }
+
+    // finalize parallel implementation
+    MPI_Finalize();
 
     return 0;
 }
