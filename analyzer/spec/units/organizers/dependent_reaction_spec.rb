@@ -23,8 +23,8 @@ module VersatileDiamond
         it { subject.reaction == target }
       end
 
-      describe '#parent' do
-        it { expect(subject.parent).to be_nil }
+      describe '#parents' do
+        it { expect(subject.parents).to be_empty }
       end
 
       describe '#name' do
@@ -65,7 +65,7 @@ module VersatileDiamond
         it { expect(subject.same?(duplicate)).to be_truthy }
         it { expect(duplicate.same?(subject)).to be_truthy }
 
-        it { expect(subject.same?(lateral_subject)).to be_truthy }
+        it { expect(subject.same?(lateral_subject)).to be_falsey }
         it { expect(lateral_subject.same?(subject)).to be_falsey }
 
         it { expect(subject.same?(dept_methyl_deactivation)).to be_falsey }

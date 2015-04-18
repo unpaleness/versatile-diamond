@@ -16,7 +16,7 @@ module VersatileDiamond
         super
         @links = straighten_graph(spec.links)
         @theres, @children, @rest = nil
-        @_similar_wheres, @_root_wheres = nil
+        @_similar_theres, @_root_theres = nil
       end
 
       # Clones the current instance but replace internal spec and change all atom
@@ -110,23 +110,23 @@ module VersatileDiamond
         spec.links
       end
 
-      # Collects list of similar where objects where each item of list is group of
+      # Collects list of similar there objects there each item of list is group of
       # object which similar by positions
       #
-      # @return [Array] the list of groups of similar where objects
-      def similar_wheres
-        return @_similar_wheres if @_similar_wheres
+      # @return [Array] the list of groups of similar there objects
+      def similar_theres
+        return @_similar_theres if @_similar_theres
 
-        pairs = wheres.combination(2).select { |a, b| a.same_positions?(b) }
-        @_similar_wheres = pairs.reduce([]) do |acc, pair|
+        pairs = theres.combination(2).select { |a, b| a.same_own_positions?(b) }
+        @_similar_theres = pairs.reduce([]) do |acc, pair|
           same = acc.find { |pr| pair.any? { |x| pr.include?(x) } }
           if same
             group = (same + pair).uniq
             # TODO: move this check to grabbing analysis result step
-            npws = group.select { |where| where.parents.empty? }
-            if npws.size > 1
-              descs = npws.map(&:description).join(' & ')
-              raise "Similar wheres detected (#{descs})"
+            roots = find_root_theres(group)
+            if roots.size > 1
+              descs = roots.map(&:to_s).join(' | ').map { |ds| %Q("#{ds}") }
+              raise "Similar theres detected (#{descs})"
             end
 
             acc - [same] + [group]
@@ -136,13 +136,11 @@ module VersatileDiamond
         end
       end
 
-      # Collects different root where objects
-      # @return [Array] the list of root where objects
-      def root_wheres
-        @_root_wheres ||= similar_wheres.reduce([]) do |acc, group|
-          acc + group.select do |where|
-            where.parents.empty? || !where.parents.all? { |pr| group.include?(pr) }
-          end
+      # Collects different root there objects
+      # @return [Array] the list of root there objects
+      def root_theres
+        @_root_theres ||= similar_theres.reduce([]) do |acc, group|
+          acc + find_root_theres(group)
         end
       end
 
@@ -200,6 +198,15 @@ module VersatileDiamond
         end
       end
 
+      # Selects root theres from passed group of theres
+      # @param [Array] group of theres
+      # @return [Array] the list of root there objects
+      def find_root_theres(group)
+        group.select do |there|
+          (group - [there]).all? { |th| !there.cover?(th) }
+        end
+      end
+
       # Stores the residual of atom difference operation
       # @param [SpecResidual] rest the residual of difference
       # @raise [RuntimeError] if residual already set
@@ -214,12 +221,6 @@ module VersatileDiamond
       # @return [Hash] the links which will be cleaned
       def cleanable_links
         original_links
-      end
-
-      # Gets the where object logic generators
-      # @return [Array] the list of where object logic generators
-      def wheres
-        theres.map(&:where).uniq
       end
     end
 
