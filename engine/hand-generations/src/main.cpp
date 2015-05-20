@@ -1,6 +1,9 @@
 #include <signal.h>
 #include <tools/init_config.h>
-#include <mpi.h>
+#include <mpi/mpi_runner.h>
+#include "handbook.h" // todo: remove it from final version
+
+using namespace vd;
 
 void stopSignalHandler(int)
 {
