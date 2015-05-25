@@ -6,7 +6,7 @@ module VersatileDiamond
       class Specie
 
         # include Stereo
-        include VersatileDiamond::Lattice
+        # include VersatileDiamond::Lattice
 
         ITER_LIMIT = 20
 

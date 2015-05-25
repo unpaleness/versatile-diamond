@@ -1,5 +1,5 @@
 module VersatileDiamond
-  module Lattice
+  module Lattices
 
     # Provides general information about elementary fragment of present lattice
     class MatrixLayout
