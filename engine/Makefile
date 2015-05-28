@@ -4,7 +4,7 @@ ARKSFLAGS	:= -DNDEBUG
 STANDART	:= -std=c++11
 
 GCC_PATH	:= /usr
-CXX		:= $(GCC_PATH)/bin/g++
+CXX		:= $(GCC_PATH)/bin/mpic++
 CFLAGS		:= $(STANDART) $(ARKSFLAGS) -O2
 
 SRC_DIR		:= cpp

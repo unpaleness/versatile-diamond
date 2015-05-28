@@ -1,7 +1,6 @@
 #include <signal.h>
 #include <tools/init_config.h>
-// #include <mpi/mpi_runner.h>
-#include <tools/runner.h>
+#include <mpi/mpi_runner.h>
 #include "handbook.h" // todo: remove it from final version
 
 using namespace vd;
@@ -29,14 +28,14 @@ int main(int argc, char *argv[])
     signal(SIGTERM, stopSignalHandler);
 
     // initialize parallel implementation
-    // MPI_Init(&argc, &argv);
-    // int nMPIThreads;
-    // MPI_Comm_size(MPI_COMM_WORLD, &nMPIThreads);
-    // if(nMPIThreads < 3)
-    // {
-    //     std::cerr << "Too few threads! Program terminates." << std::endl;
-    //     return 1;
-    // }
+    MPI_Init(&argc, &argv);
+    int nMPIThreads;
+    MPI_Comm_size(MPI_COMM_WORLD, &nMPIThreads);
+    if(nMPIThreads < 3)
+    {
+        std::cerr << "Too few threads! Program terminates." << std::endl;
+        return 1;
+    }
 
     try
     {
@@ -50,7 +49,7 @@ int main(int argc, char *argv[])
     }
 
     // finalize parallel implementation
-    // MPI_Finalize();
+    MPI_Finalize();
 
     return 0;
 }
