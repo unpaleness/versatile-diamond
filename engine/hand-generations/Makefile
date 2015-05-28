@@ -1,4 +1,4 @@
-NAME		:= simple-diamond
+NAME	:= simple-diamond
 
 ENGINE_DIR	:= ..
 ENGINE_SRC_DIR	:= $(ENGINE_DIR)/cpp
@@ -10,20 +10,20 @@ ARKSFLAGS	:= -DNDEBUG
 STANDART	:= -std=c++11
 
 GCC_PATH	:= /usr
-CXX		:= $(GCC_PATH)/bin/mpic++
-DFLAGS		:= $(STANDART) -I$(ENGINE_SRC_DIR)
-CFLAGS		:= $(DFLAGS) -O2
-LFLAGS		:= $(STANDART) -lyaml-cpp
+CXX	:= $(GCC_PATH)/bin/g++
+DFLAGS	:= $(STANDART) -I$(ENGINE_SRC_DIR)
+CFLAGS	:= $(DFLAGS) -O2
+LFLAGS	:= $(STANDART) -lyaml-cpp
 
 HGEN_SRC_DIR	:= src
 HGEN_OBJS_DIR	:= obj
 
-SOURCE_DIRS     := $(shell find $(HGEN_SRC_DIR) -type d)
-OBJECTS_DIRS    := $(SOURCE_DIRS:$(HGEN_SRC_DIR)%=$(HGEN_OBJS_DIR)%)
+SOURCE_DIRS	:= $(shell find $(HGEN_SRC_DIR) -type d)
+OBJECTS_DIRS	:= $(SOURCE_DIRS:$(HGEN_SRC_DIR)%=$(HGEN_OBJS_DIR)%)
 
-SOURCE_FILES    := $(wildcard $(addsuffix /*.cpp, $(SOURCE_DIRS)))
-SOURCE_OBJECTS  := $(patsubst $(HGEN_SRC_DIR)/%, $(HGEN_OBJS_DIR)/%, $(SOURCE_FILES:%.cpp=%.o))
-MD_FILES        := $(SOURCE_OBJECTS:%.o=%.d)
+SOURCE_FILES	:= $(wildcard $(addsuffix /*.cpp, $(SOURCE_DIRS)))
+SOURCE_OBJECTS	:= $(patsubst $(HGEN_SRC_DIR)/%, $(HGEN_OBJS_DIR)/%, $(SOURCE_FILES:%.cpp=%.o))
+MD_FILES	:= $(SOURCE_OBJECTS:%.o=%.d)
 
 .PHONY: all dirs exec clean
 
